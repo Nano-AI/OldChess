@@ -11,7 +11,7 @@ Piece::Piece(Vector2 coord, int side) {
 }
 
 int Piece::GetSide() {
-	this->side;
+	return this->side;
 }
 
 bool Piece::IsWhite() {
@@ -28,4 +28,10 @@ int Piece::Y() {
 
 Vector2 Piece::GetCoord() {
 	return this->coord;
+}
+
+bool Piece::Move(int x, int y) {
+	// Add check for this some day
+	GetValidMoves();
+	return true;
 }

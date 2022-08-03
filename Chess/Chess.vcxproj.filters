@@ -13,41 +13,59 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="Source Files\pieces">
+      <UniqueIdentifier>{afcb7a07-fa06-4d25-a96f-613323518bc8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\pieces">
+      <UniqueIdentifier>{bbc3e1ef-c762-4ff2-a965-d73e29d5d15c}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="main.cpp">
+    <ClCompile Include="src\main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="window.cpp">
+    <ClCompile Include="src\gui\window.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="loguru.cpp">
+    <ClCompile Include="src\loguru.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="board.cpp">
+    <ClCompile Include="src\game\board.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="renderer.cpp">
+    <ClCompile Include="src\gui\renderer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="image.cpp">
+    <ClCompile Include="src\gui\image.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\game\pieces\pawn.cpp">
+      <Filter>Source Files\pieces</Filter>
+    </ClCompile>
+    <ClCompile Include="src\game\piece.cpp">
+      <Filter>Source Files\pieces</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="window.h">
+    <ClInclude Include="src\gui\window.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="board.h">
+    <ClInclude Include="src\game\board.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="pieces.h">
+    <ClInclude Include="src\game\pieces.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="renderer.h">
+    <ClInclude Include="src\gui\renderer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="image.h">
+    <ClInclude Include="src\gui\image.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\game\pieces\pawn.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\game\piece.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

@@ -8,7 +8,7 @@
 #include <stdlib.h>
 #include "window.h"
 #include "image.h"
-#include "board.h"
+#include "../game/board.h"
 
 namespace fs = std::filesystem;
 

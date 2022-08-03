@@ -7,7 +7,7 @@
 #include <loguru.hpp>
 #include <map>
 #include "window.h"
-#include "pieces.h"
+#include "../game/pieces.h"
 
 namespace fs = std::filesystem;
 

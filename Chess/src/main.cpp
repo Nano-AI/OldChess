@@ -1,12 +1,12 @@
 #include <SDL2/SDL.h>
 #include <iostream>
 #include <loguru.hpp>
-#include "window.h"
-#include "board.h"
-#include "renderer.h"
-#include "image.h"
-#include "piece.h"
-#include "pawn.h"
+#include "./gui/window.h"
+#include "./game/board.h"
+#include "./gui/renderer.h"
+#include "./gui/image.h"
+#include "./game/piece.h"
+#include "./game/pieces/pawn.h"
 
 int main(int argc, char* argv[]) {
 	loguru::init(argc, argv);

@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|Win32">
@@ -171,19 +171,23 @@ echo All | xcopy $(ProjectDir)resources $(OutDir)resources /s /i </Command>
     </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="board.cpp" />
-    <ClCompile Include="image.cpp" />
-    <ClCompile Include="loguru.cpp" />
-    <ClCompile Include="main.cpp" />
-    <ClCompile Include="renderer.cpp" />
-    <ClCompile Include="window.cpp" />
+    <ClCompile Include="src\game\board.cpp" />
+    <ClCompile Include="src\gui\image.cpp" />
+    <ClCompile Include="src\loguru.cpp" />
+    <ClCompile Include="src\main.cpp" />
+    <ClCompile Include="src\game\pieces\pawn.cpp" />
+    <ClCompile Include="src\game\piece.cpp" />
+    <ClCompile Include="src\gui\renderer.cpp" />
+    <ClCompile Include="src\gui\window.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="board.h" />
-    <ClInclude Include="image.h" />
-    <ClInclude Include="pieces.h" />
-    <ClInclude Include="renderer.h" />
-    <ClInclude Include="window.h" />
+    <ClInclude Include="src\game\board.h" />
+    <ClInclude Include="src\gui\image.h" />
+    <ClInclude Include="src\game\pieces\pawn.h" />
+    <ClInclude Include="src\game\piece.h" />
+    <ClInclude Include="src\game\pieces.h" />
+    <ClInclude Include="src\gui\renderer.h" />
+    <ClInclude Include="src\gui\window.h" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="resources\pieces\black\Bishop.png" />

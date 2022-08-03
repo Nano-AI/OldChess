@@ -1,5 +1,5 @@
 #include "renderer.h"
-
+#define INNER_PADDING 10
 
 // Just colors for the board
 static int light_square_rgb[3] = { 243, 242, 242 };
@@ -59,10 +59,6 @@ void Renderer::Render(bool filter_event) {
     SDL_RenderPresent(this->win->g_renderer);
 }
 
-void Renderer::Update() {
-    
-}
-
 void Renderer::DrawBoard(bool pov_white) {
     //LOG_F(ERROR, "RAAHHHHHH");
     // Get the renderer and clear it
@@ -109,17 +105,39 @@ void Renderer::DrawPieces(bool pov_white) {
     auto size = values.size;
     auto x_offset = values.x_offset;
     auto y_offset = values.y_offset;
+
     int piece_at;
+
     for (int x = 0; x < 8; x++) {
         for (int y = 0; y < 8; y++) {
             if (board[x][y] != BLANK) {
+                // Find the piece we're at.
+                // If it's white, start at the beginning, otherwise start at the end.
+                piece_at = (pov_white) ? board[x][y] : board[7 - x][7 - y];
+                // Find the texture of the current piece
+                auto piece = loaded_pieces.find(piece_at);
+                SDL_Point image_size;
+                SDL_QueryTexture(piece->second, NULL, NULL, &image_size.x, &image_size.y);
                 SDL_Rect rect;
+                // Correct scaling to maintain aspect ratio of images
+                if (image_size.x > image_size.y) {
+                    float ratio = (float) image_size.x / (float) image_size.y;
+                    rect.w = size - 2 * INNER_PADDING;
+                    rect.h = rect.w / ratio;
+
+                }
+                else {
+                    float ratio = (float) image_size.y / (float) image_size.x;
+                    rect.h = size - 2 * INNER_PADDING;
+                    rect.w = rect.h / ratio;
+                }
+                // Set the size of the images
+                // Set the offset of the piece (not centered, but at the top left of the square)
                 rect.x = (y * (size + 1)) + x_offset;
                 rect.y = (x * (size + 1)) + y_offset;
-                rect.w = size + 1;
-                rect.h = size + 1;
-                piece_at = (pov_white) ? board[x][y] : board[7 - x][7 - y];
-                auto piece = loaded_pieces.find(piece_at);
+                // Center the piece in the box
+                rect.x += (size - rect.w) / 2;
+                rect.y += (size - rect.h) / 2;
                 if (piece == loaded_pieces.end()) {
                     LOG_F(ERROR, "Error loading piece |0x%0.4x|", piece);
                 }

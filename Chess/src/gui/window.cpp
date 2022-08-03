@@ -1,5 +1,4 @@
 #include "window.h"
-#include <iostream>
 
 Window::Window(int width, int height, std::string title) {
 	g_width = width;

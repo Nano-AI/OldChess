@@ -26,9 +26,9 @@ public:
 	int X();
 	int Y();
 	Vector2 GetCoord();
-	virtual bool Move(int x, int y);
-	virtual Piece* Clone();
-	virtual std::vector<Vector2> GetValidMoves();
-	virtual bool IsKing();
+	//virtual bool Move(int x, int y) = 0;
+	bool Move(int x, int y);
+	virtual Piece* Clone() = 0;
+	virtual std::vector<Vector2> GetValidMoves() = 0;
 };
 

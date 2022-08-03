@@ -2,7 +2,7 @@
 #include <iostream>
 #include <vector>
 #include <stdio.h>
-#include "pieces.h"
+#include "./pieces.h"
 
 class Board
 {
