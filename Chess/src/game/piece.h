@@ -10,15 +10,16 @@ struct Vector2 {
 
 class Piece
 {
-protected:
+public:
+	// I'd put it private but I'm to lazy to make get functions.
+	// SDL rectangle
+	SDL_Rect box;
 	bool g_is_white;
 	bool g_is_king = false;
 	bool g_first_move = true;
-	Vector2 coord;
-	int side;
-public:
-	// SDL rectangle
-	SDL_Rect box;
+	Vector2 g_coord;
+	int g_side;
+	int g_piece;
 	Piece(Vector2 coord, int side);
 	Piece(int x, int y, int side);
 	int GetSide();

@@ -171,6 +171,12 @@ echo All | xcopy $(ProjectDir)resources $(OutDir)resources /s /i </Command>
     </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\game\pieces\rook.cpp" />
+    <ClCompile Include="src\game\pieces\king.cpp" />
+    <ClCompile Include="src\game\pieces\queen.cpp" />
+    <ClCompile Include="src\game\pieces\knight.cpp" />
+    <ClCompile Include="src\game\pieces\bishop.cpp" />
+    <ClCompile Include="src\game\pieces\empty.cpp" />
     <ClCompile Include="src\game\board.cpp" />
     <ClCompile Include="src\gui\image.cpp" />
     <ClCompile Include="src\loguru.cpp" />
@@ -181,6 +187,12 @@ echo All | xcopy $(ProjectDir)resources $(OutDir)resources /s /i </Command>
     <ClCompile Include="src\gui\window.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\game\pieces\rook.h" />
+    <ClInclude Include="src\game\pieces\king.h" />
+    <ClInclude Include="src\game\pieces\queen.h" />
+    <ClInclude Include="src\game\pieces\knight.h" />
+    <ClInclude Include="src\game\pieces\bishop.h" />
+    <ClInclude Include="src\game\pieces\empty.h" />
     <ClInclude Include="src\game\board.h" />
     <ClInclude Include="src\gui\image.h" />
     <ClInclude Include="src\game\pieces\pawn.h" />

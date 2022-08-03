@@ -106,16 +106,16 @@ void Renderer::DrawPieces(bool pov_white) {
     auto x_offset = values.x_offset;
     auto y_offset = values.y_offset;
 
-    int piece_at;
+    Piece* piece_at;
 
     for (int x = 0; x < 8; x++) {
         for (int y = 0; y < 8; y++) {
-            if (board[x][y] != BLANK) {
+            if (board[x][y]->g_piece != BLANK) {
                 // Find the piece we're at.
                 // If it's white, start at the beginning, otherwise start at the end.
                 piece_at = (pov_white) ? board[x][y] : board[7 - x][7 - y];
                 // Find the texture of the current piece
-                auto piece = loaded_pieces.find(piece_at);
+                auto piece = loaded_pieces.find(piece_at->g_piece);
                 SDL_Point image_size;
                 SDL_QueryTexture(piece->second, NULL, NULL, &image_size.x, &image_size.y);
                 SDL_Rect rect;
@@ -146,7 +146,7 @@ void Renderer::DrawPieces(bool pov_white) {
                 }
             }
         }
-    }
+    
 }
 
 int Renderer::HandleInput(SDL_Event* event) {

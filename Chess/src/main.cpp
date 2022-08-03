@@ -20,10 +20,7 @@ int main(int argc, char* argv[]) {
 
 	bool done = false;
 
-	board.PrintBoard();
-
-	Pawn p = Pawn(0, 1, WHITE);
-	
+	board.PrintBoard();	
 
 	while ((!done) && (SDL_WaitEvent(&event))) {
 		//render.Update();

@@ -1,33 +1,33 @@
 #include "piece.h"
 
 Piece::Piece(int x, int y, int side) {
-	this->coord = { x, y };
-	this->side = side;
+	this->g_coord = { x, y };
+	this->g_side = side;
 }
 
 Piece::Piece(Vector2 coord, int side) {
-	this->coord = coord;
-	this->side = side;
+	this->g_coord = coord;
+	this->g_side = side;
 }
 
 int Piece::GetSide() {
-	return this->side;
+	return this->g_side;
 }
 
 bool Piece::IsWhite() {
-	return this->side == WHITE;
+	return this->g_side == WHITE;
 }
 
 int Piece::X() {
-	return this->coord.x;
+	return this->g_coord.x;
 }
 
 int Piece::Y() {
-	return this->coord.y;
+	return this->g_coord.y;
 }
 
 Vector2 Piece::GetCoord() {
-	return this->coord;
+	return this->g_coord;
 }
 
 bool Piece::Move(int x, int y) {
