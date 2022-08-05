@@ -26,7 +26,11 @@ private:
 	Image images;
 	Window* win;
 	Board* board;
-	std::vector<std::vector<SDL_Rect>> pieces;
+	SDL_Point mouse_pos;
+	bool mouse_down;
+	Piece* selected_piece;
+	std::vector<std::vector<Empty*>> empty_spots;
+	void MouseUp(SDL_Event* event);
 	//int FilterEvent(void* userdata, SDL_Event* event);
 };
 

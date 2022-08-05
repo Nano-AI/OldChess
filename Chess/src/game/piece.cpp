@@ -32,6 +32,13 @@ Vector2 Piece::GetCoord() {
 
 bool Piece::Move(int x, int y) {
 	// Add check for this some day
-	GetValidMoves();
+	std::vector<Vector2> valid_moves = GetValidMoves();
+	/*for (Vector2 move : valid_moves) {
+		if (move.x == x && move.y) {
+			return true;
+		}
+	}
+	return false;*/
 	return true;
 }
+

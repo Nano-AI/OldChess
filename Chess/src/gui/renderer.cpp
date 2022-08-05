@@ -18,6 +18,10 @@ struct RenderMathValues {
     int y_offset;
 };
 
+bool CoordEqual(Vector2* point1, Vector2* point2) {
+    return point1->x == point2->x && point2->y == point2->y;
+}
+
 RenderMathValues CalculateDetails(Window* win) {
     RenderMathValues board;
     // Find shortest side and find size of each square
@@ -46,6 +50,11 @@ Renderer::Renderer(Window* win, Board* board, int render_side) : win(this->win),
     auto x_offset = values.x_offset;
     auto y_offset = values.y_offset;
 
+    this->empty_spots = std::vector<std::vector<Empty*>> (
+        8,
+        std::vector<Empty*>(8)
+    );
+
 	LOG_F(INFO, "Setup renderer.");
 }
 
@@ -69,11 +78,15 @@ void Renderer::DrawBoard(bool pov_white) {
     auto y_offset = values.y_offset;
     for (int x = 0; x < 8; x++) {
         for (int y = 0; y < 8; y++) {
+            // No clue why swapping x and y where fixes it, but it does.
+            // :/
+            this->empty_spots[x][y] = new Empty(x, y, EMPTY);
             SDL_Rect rect;
             rect.x = (x * (size + 1)) + x_offset;
             rect.y = (y * (size + 1)) + y_offset;
             rect.w = size + 1;
             rect.h = size + 1;
+            this->empty_spots[x][y]->g_box = rect;
             if ((x + y) % 2 == 0) {
                 if (pov_white) {
                     SDL_SetRenderDrawColor(render, light_square_rgb[0], light_square_rgb[1], light_square_rgb[2], 255);
@@ -121,23 +134,33 @@ void Renderer::DrawPieces(bool pov_white) {
                 SDL_Rect rect;
                 // Correct scaling to maintain aspect ratio of images
                 if (image_size.x > image_size.y) {
-                    float ratio = (float) image_size.x / (float) image_size.y;
+                    float ratio = (float)image_size.x / (float)image_size.y;
                     rect.w = size - 2 * INNER_PADDING;
                     rect.h = rect.w / ratio;
 
                 }
                 else {
-                    float ratio = (float) image_size.y / (float) image_size.x;
+                    float ratio = (float)image_size.y / (float)image_size.x;
                     rect.h = size - 2 * INNER_PADDING;
                     rect.w = rect.h / ratio;
                 }
                 // Set the size of the images
                 // Set the offset of the piece (not centered, but at the top left of the square)
-                rect.x = (y * (size + 1)) + x_offset;
-                rect.y = (x * (size + 1)) + y_offset;
-                // Center the piece in the box
-                rect.x += (size - rect.w) / 2;
-                rect.y += (size - rect.h) / 2;
+                if (this->selected_piece &&
+                    piece_at->g_coord.x == this->selected_piece->g_coord.x &&
+                    piece_at->g_coord.y == this->selected_piece->g_coord.y) {
+                    // Move selected piece to a coordinate and center it on the mouse
+                    SDL_Point clickOffset;
+                    rect.x = this->mouse_pos.x - (rect.w)/2;
+                    rect.y = this->mouse_pos.y - (rect.h)/2;
+                } else {
+                    rect.x = (y * (size + 1)) + x_offset;
+                    rect.y = (x * (size + 1)) + y_offset;
+                    // Center the piece in the box
+                    rect.x += (size - rect.w) / 2;
+                    rect.y += (size - rect.h) / 2;
+                }
+                this->board->g_game_board[x][y]->g_box = rect;
                 if (piece == loaded_pieces.end()) {
                     LOG_F(ERROR, "Error loading piece |0x%0.4x|", piece);
                 }
@@ -146,16 +169,54 @@ void Renderer::DrawPieces(bool pov_white) {
                 }
             }
         }
-    
+    }
 }
 
 int Renderer::HandleInput(SDL_Event* event) {
+    // Window event handling
     switch (event->type) {
     case SDL_WINDOWEVENT:
         if (event->type == SDL_WINDOWEVENT && (event->window.event == SDL_WINDOWEVENT_RESIZED || event->window.event == SDL_WINDOWEVENT_SIZE_CHANGED)) {
-            LOG_F(INFO, "Resizing window...\n");
+            LOG_F(INFO, "Resizing window...");
             DrawBoard();
             this->win->ResizeWindow(event->window.data1, event->window.data2);
+        }
+        break;
+    case SDL_MOUSEMOTION:
+        this->mouse_pos = { event->motion.x, event->motion.y };
+    case SDL_MOUSEBUTTONDOWN:
+        if (!this->mouse_down && event->button.button == SDL_BUTTON_LEFT) {
+            for (int x = 0; x < 8; x++) {
+                for (int y = 0; y < 8; y++) {
+                    Piece* piece = this->empty_spots[x][y];
+                    Piece* p2 = this->board->g_game_board[x][y];
+                    if (SDL_PointInRect(&this->mouse_pos, &piece->g_box)) {
+                        LOG_F(ERROR, "Clicked on(%i, %i) [%i, %i]: (0x%0.4x) (%i, %i)", piece->g_coord.x, piece->g_coord.y, p2->g_coord.x, p2->g_coord.y, piece->g_piece, x, y);
+                        break;
+                    }
+                }
+            }
+            this->mouse_down = true;
+            for (int x = 0; x < 8; x++) {
+                for (int y = 0; y < 8; y++) {
+                    if (this->board->g_game_board[x][y] == BLANK)
+                        break;
+                    Piece* piece = this->board->g_game_board[x][y];
+                    if (SDL_PointInRect(&this->mouse_pos, &piece->g_box)) {
+                        LOG_F(INFO, "Grabbed piece at (%i, %i)", piece->g_coord.x, piece->g_coord.y);
+                        this->selected_piece = piece;
+                        break;
+                    }
+                }
+            }
+        }
+        break;
+    case SDL_MOUSEBUTTONUP:
+        if (this->mouse_down && event->button.button == SDL_BUTTON_LEFT) {
+            MouseUp(event);
+            this->board->PrintBoard();
+            this->mouse_down = false;
+            this->selected_piece = NULL;
         }
         break;
     default:
@@ -164,6 +225,40 @@ int Renderer::HandleInput(SDL_Event* event) {
     return 1;
 }
 
+void Renderer::MouseUp(SDL_Event* event) {
+    if (!this->mouse_down || this->selected_piece == NULL) {
+        return;
+    }
+    Piece* dropped_box = NULL;
+    for (int x = 0; x < 8; x++) {
+        if (dropped_box != NULL) {
+            break;
+        }
+        for (int y = 0; y < 8; y++) {
+            /* Make sure that the piece isn't the same as the selected piece that the piece was in */
+            if (CoordEqual(&this->selected_piece->g_coord, &this->board->g_game_board[x][y]->g_coord) ||
+                /* Check for empty boxes as well */
+                CoordEqual(&this->selected_piece->g_coord, &this->empty_spots[x][y]->g_coord)) {
+                continue;
+            }
+            if (/* Check if player dropped it on a piece */
+                SDL_PointInRect(&this->mouse_pos, &this->board->g_game_board[x][y]->g_box) ||
+                /* Check if player dropped it on an empty box */
+                SDL_PointInRect(&this->mouse_pos, &this->empty_spots[x][y]->g_box)) {
+                dropped_box = this->board->g_game_board[x][y];
+                LOG_F(INFO, "Dropped piece at (%i, %i)", dropped_box->X(), dropped_box->Y());
+                break;
+            }
+        }
+    }
+    if (dropped_box == NULL) {
+        return;
+    }
+    Vector2 start = this->selected_piece->g_coord;
+    Vector2 end = dropped_box->g_coord;
+    // Honestly, I'm not sure why this is the way it is, but it works and I'm too lazy to make a proper implementation
+    this->board->Move(start.x, start.y, end.x, end.y);
+}
 
 int FilterEvent(void* userdata, SDL_Event* event) {
     if (event->type == SDL_WINDOWEVENT && event->window.event == SDL_WINDOWEVENT_RESIZED) {
@@ -174,7 +269,6 @@ int FilterEvent(void* userdata, SDL_Event* event) {
         //return 0 if you don't want to handle this event twice
         return 0;
     }
-
     //important to allow all events, or your SDL_PollEvent doesn't get any event
     return 1;
 }

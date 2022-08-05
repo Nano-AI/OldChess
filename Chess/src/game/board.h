@@ -12,6 +12,7 @@
 #include "./pieces/rook.h"
 #include "./pieces/queen.h"
 #include "./pieces/king.h"
+#include "./errors.h"
 
 
 class Board
@@ -20,8 +21,11 @@ public:
 	Board();
 	void PrintBoard();
 	std::vector<std::vector<Piece*>> GetBoard();
-private:
-	std::vector<std::vector<Piece*>> game_board;
+	std::vector<std::vector<Piece*>> g_game_board;
+	int Move(int startX, int startY, int toX, int toY);
+	/*int Move(Vector2 start, Vector2 end);
+	int Move(Piece* start, Piece* end);*/
+	Piece* At(int x, int y);
 	//int game_board[8][8];
 };
 

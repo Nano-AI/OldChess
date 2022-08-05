@@ -24,11 +24,11 @@ int main(int argc, char* argv[]) {
 
 	while ((!done) && (SDL_WaitEvent(&event))) {
 		//render.Update();
+		render.HandleInput(&event);
 		render.Render();
 		win.HandleInput(&event);
 		// Render handles window resize
 		// :/
-		render.HandleInput(&event);
 		//LOG_F(ERROR, "RAAHHHHH");
 		switch (event.type) {
 		case SDL_QUIT:

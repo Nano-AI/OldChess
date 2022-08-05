@@ -13,7 +13,7 @@ class Piece
 public:
 	// I'd put it private but I'm to lazy to make get functions.
 	// SDL rectangle
-	SDL_Rect box;
+	SDL_Rect g_box;
 	bool g_is_white;
 	bool g_is_king = false;
 	bool g_first_move = true;
