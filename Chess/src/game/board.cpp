@@ -37,6 +37,11 @@ Board::Board() {
 			this->g_game_board[x][y] = new Empty(x, y, EMPTY);
 		}
 	}
+	for (int x = 0; x < 8; x++) {
+		for (int y = 0; y < 8; y++) {
+			this->g_game_board[x][y]->g_coord = { x, y };
+		}
+	}
 }
 
 void Board::PrintBoard() {
@@ -78,7 +83,7 @@ int Board::Move(int startX, int startY, int toX, int toY) {
 	}
 	delete(this->g_game_board[toX][toY]);
 	this->g_game_board[toX][toY] = start->Clone();
-	this->g_game_board[toX][toX]->g_coord = { toX, toY };
+	this->g_game_board[toX][toY]->g_coord = { toX, toY };
 	delete(this->g_game_board[startX][startY]);
 	this->g_game_board[startX][startY] = new Empty(startX, startY, EMPTY);
 	return SUCCESS;

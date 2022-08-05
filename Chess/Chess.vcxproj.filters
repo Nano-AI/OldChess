@@ -104,6 +104,9 @@
     <ClInclude Include="src\game\pieces\rook.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="src\game\errors.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Image Include="resources\pieces\black\Bishop.png">

@@ -187,6 +187,7 @@ echo All | xcopy $(ProjectDir)resources $(OutDir)resources /s /i </Command>
     <ClCompile Include="src\gui\window.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\game\errors.h" />
     <ClInclude Include="src\game\pieces\rook.h" />
     <ClInclude Include="src\game\pieces\king.h" />
     <ClInclude Include="src\game\pieces\queen.h" />

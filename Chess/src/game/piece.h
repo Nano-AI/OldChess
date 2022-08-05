@@ -31,5 +31,6 @@ public:
 	bool Move(int x, int y);
 	virtual Piece* Clone() = 0;
 	virtual std::vector<Vector2> GetValidMoves() = 0;
+	//virtual std::vector<Vector2> GetValidMoves(std::vector<std::vector<Piece*>> board) = 0;
 };
 

@@ -19,7 +19,7 @@ struct RenderMathValues {
 };
 
 bool CoordEqual(Vector2* point1, Vector2* point2) {
-    return point1->x == point2->x && point2->y == point2->y;
+    return point1->x == point2->x && point1->y == point2->y;
 }
 
 RenderMathValues CalculateDetails(Window* win) {
@@ -65,6 +65,7 @@ void Renderer::Render(bool filter_event) {
     SDL_RenderClear(this->win->g_renderer);
     DrawBoard(this->pov_white);
     DrawPieces(this->pov_white);
+    //DrawPossibleMoves(this->pov_white);
     SDL_RenderPresent(this->win->g_renderer);
 }
 
@@ -127,6 +128,8 @@ void Renderer::DrawPieces(bool pov_white) {
                 // Find the piece we're at.
                 // If it's white, start at the beginning, otherwise start at the end.
                 piece_at = (pov_white) ? board[x][y] : board[7 - x][7 - y];
+                // I have to do this because somewhere in my code, the coordinates get updated to the wrong ones.
+                board[x][y]->g_coord = { x, y };
                 // Find the texture of the current piece
                 auto piece = loaded_pieces.find(piece_at->g_piece);
                 SDL_Point image_size;
@@ -214,7 +217,7 @@ int Renderer::HandleInput(SDL_Event* event) {
     case SDL_MOUSEBUTTONUP:
         if (this->mouse_down && event->button.button == SDL_BUTTON_LEFT) {
             MouseUp(event);
-            this->board->PrintBoard();
+            //this->board->PrintBoard();
             this->mouse_down = false;
             this->selected_piece = NULL;
         }
@@ -236,16 +239,16 @@ void Renderer::MouseUp(SDL_Event* event) {
         }
         for (int y = 0; y < 8; y++) {
             /* Make sure that the piece isn't the same as the selected piece that the piece was in */
-            if (CoordEqual(&this->selected_piece->g_coord, &this->board->g_game_board[x][y]->g_coord) ||
-                /* Check for empty boxes as well */
-                CoordEqual(&this->selected_piece->g_coord, &this->empty_spots[x][y]->g_coord)) {
-                continue;
-            }
+            //if (CoordEqual(&this->selected_piece->g_coord, &this->board->g_game_board[x][y]->g_coord) ||
+            //    /* Check for empty boxes as well */
+            //    CoordEqual(&this->selected_piece->g_coord, &this->empty_spots[x][y]->g_coord)) {
+            //    continue;
+            //}
             if (/* Check if player dropped it on a piece */
-                SDL_PointInRect(&this->mouse_pos, &this->board->g_game_board[x][y]->g_box) ||
+                //SDL_PointInRect(&this->mouse_pos, &this->board->g_game_board[x][y]->g_box) ||
                 /* Check if player dropped it on an empty box */
                 SDL_PointInRect(&this->mouse_pos, &this->empty_spots[x][y]->g_box)) {
-                dropped_box = this->board->g_game_board[x][y];
+                dropped_box = this->empty_spots[y][x];
                 LOG_F(INFO, "Dropped piece at (%i, %i)", dropped_box->X(), dropped_box->Y());
                 break;
             }

@@ -9,6 +9,12 @@ Pawn::Pawn(int x, int y, int side) : Piece(x, y, side) {
 
 std::vector<Vector2> Pawn::GetValidMoves() {
 	std::vector<Vector2> moves;
+	int x = this->g_coord.x;
+	int y = this->g_coord.y;
+	int direction = (this->IsWhite()) ? -1 : 1;
+	if (g_first_move) {
+		moves.push_back({ x + (2 * direction), y});
+	}
 	return moves;
 }
 
