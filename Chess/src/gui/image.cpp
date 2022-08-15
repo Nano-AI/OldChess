@@ -11,10 +11,10 @@ void Image::LoadPieces(const char* white_dir, const char* black_dir) {
     loaded_white_dir.insert(loaded_black_dir.begin(), loaded_black_dir.end());
     // Set global pieces to all the pieces
     this->g_pieces_images = loaded_white_dir;
-    for (auto it = loaded_white_dir.begin(); it != loaded_white_dir.end(); ++it) {
+    /*for (auto it = loaded_white_dir.begin(); it != loaded_white_dir.end(); ++it) {
         std::cout << "Key: " << it->first << "\t";
         std::cout << "Value: " << it->second << std::endl;
-    }
+    }*/
 }
 
 //SDL_Texture* Image::LoadDirectory(const char* directory) {

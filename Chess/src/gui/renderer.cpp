@@ -33,17 +33,26 @@ RenderMathValues CalculateDetails(Window* win) {
     return board;
 }
 
-Renderer::Renderer(Window* win, Board* board, int render_side) : win(this->win), board(this->board) {
+Renderer::Renderer(Window* win, Board* board) : win(this->win), board(this->board) {
     // I need this cause it doesn't work without it :/
     this->win = win;
     this->board = board;
     // If it should be drawed from white's point of view.
-    this->pov_white = render_side == WHITE;
     SDL_SetEventFilter(FilterEvent, this);
     Image image;
     image.win = this->win;
     image.LoadPieces(c_white_dir, c_black_dir);
     this->images = image;
+
+    // Get sizes of images
+    for (auto& [piece, texture] : this->images.g_pieces_images) {
+        int x = 0;
+        int y = 0;
+        int p = piece;
+        SDL_QueryTexture(texture, NULL, NULL, &x, &y);
+        this->sizes.insert(std::pair<int, Vector2>(p, { x, y }));
+    }
+
      
     auto values = CalculateDetails(this->win);
     auto size = values.size;
@@ -55,6 +64,13 @@ Renderer::Renderer(Window* win, Board* board, int render_side) : win(this->win),
         std::vector<Empty*>(8)
     );
 
+    // Setup the empty spaces
+    for (int x = 0; x < 8; x++) {
+        for (int y = 0; y < 8; y++) {
+            this->empty_spots[x][y] = new Empty(x, y, EMPTY);
+        }
+    }
+
 	LOG_F(INFO, "Setup renderer.");
 }
 
@@ -63,13 +79,13 @@ void Renderer::Render(bool filter_event) {
         SDL_GetWindowSize(win->g_window, &win->g_width, &win->g_height);
     }
     SDL_RenderClear(this->win->g_renderer);
-    DrawBoard(this->pov_white);
-    DrawPieces(this->pov_white);
+    DrawBoard();
+    DrawPieces();
     //DrawPossibleMoves(this->pov_white);
     SDL_RenderPresent(this->win->g_renderer);
 }
 
-void Renderer::DrawBoard(bool pov_white) {
+void Renderer::DrawBoard() {
     //LOG_F(ERROR, "RAAHHHHHH");
     // Get the renderer and clear it
     SDL_Renderer* render = win->g_renderer;
@@ -79,30 +95,17 @@ void Renderer::DrawBoard(bool pov_white) {
     auto y_offset = values.y_offset;
     for (int x = 0; x < 8; x++) {
         for (int y = 0; y < 8; y++) {
-            // No clue why swapping x and y where fixes it, but it does.
-            // :/
-            this->empty_spots[x][y] = new Empty(x, y, EMPTY);
             SDL_Rect rect;
             rect.x = (x * (size + 1)) + x_offset;
             rect.y = (y * (size + 1)) + y_offset;
             rect.w = size + 1;
             rect.h = size + 1;
             this->empty_spots[x][y]->g_box = rect;
-            if ((x + y) % 2 == 0) {
-                if (pov_white) {
-                    SDL_SetRenderDrawColor(render, light_square_rgb[0], light_square_rgb[1], light_square_rgb[2], 255);
-                }
-                else {
-                    SDL_SetRenderDrawColor(render, dark_square_rgb[0], dark_square_rgb[1], dark_square_rgb[2], 255);
-                }
-            }
-            else {
-                if (pov_white) {
-                    SDL_SetRenderDrawColor(render, dark_square_rgb[0], dark_square_rgb[1], dark_square_rgb[2], 255);
-                }
-                else {
-                    SDL_SetRenderDrawColor(render, light_square_rgb[0], light_square_rgb[1], light_square_rgb[2], 255);
-                }
+            if (this->board->g_board_colors[x][y] == WHITE) {
+                SDL_SetRenderDrawColor(render, light_square_rgb[0], light_square_rgb[1], light_square_rgb[2], 255);
+            } else {
+                SDL_SetRenderDrawColor(render, dark_square_rgb[0], dark_square_rgb[1], dark_square_rgb[2], 255);
+
             }
             SDL_RenderFillRect(render, &rect);
         }
@@ -110,7 +113,7 @@ void Renderer::DrawBoard(bool pov_white) {
     SDL_SetRenderDrawColor(render, background_rgb[0], background_rgb[1], background_rgb[2], 255);
 }
 
-void Renderer::DrawPieces(bool pov_white) {
+void Renderer::DrawPieces() {
     auto board = this->board->GetBoard();
     auto loaded_pieces = this->images.g_pieces_images;
     auto render = this->win->g_renderer;
@@ -120,43 +123,37 @@ void Renderer::DrawPieces(bool pov_white) {
     auto x_offset = values.x_offset;
     auto y_offset = values.y_offset;
 
-    Piece* piece_at;
-
     for (int x = 0; x < 8; x++) {
         for (int y = 0; y < 8; y++) {
             if (board[x][y]->g_piece != BLANK) {
-                // Find the piece we're at.
-                // If it's white, start at the beginning, otherwise start at the end.
-                piece_at = (pov_white) ? board[x][y] : board[7 - x][7 - y];
                 // I have to do this because somewhere in my code, the coordinates get updated to the wrong ones.
-                board[x][y]->g_coord = { x, y };
+                // board[x][y]->g_coord = { x, y };
                 // Find the texture of the current piece
-                auto piece = loaded_pieces.find(piece_at->g_piece);
-                SDL_Point image_size;
-                SDL_QueryTexture(piece->second, NULL, NULL, &image_size.x, &image_size.y);
+                auto piece = loaded_pieces.find(board[x][y]->g_piece);
+                auto image_size = this->sizes.find(board[x][y]->g_piece);
                 SDL_Rect rect;
                 // Correct scaling to maintain aspect ratio of images
-                if (image_size.x > image_size.y) {
-                    float ratio = (float)image_size.x / (float)image_size.y;
+                if (image_size->second.x > image_size->second.y) {
+                    float ratio = (float)image_size->second.x / (float)image_size->second.y;
                     rect.w = size - 2 * INNER_PADDING;
                     rect.h = rect.w / ratio;
 
-                }
-                else {
-                    float ratio = (float)image_size.y / (float)image_size.x;
+                } else {
+                    float ratio = (float)image_size->second.y / (float)image_size->second.x;
                     rect.h = size - 2 * INNER_PADDING;
                     rect.w = rect.h / ratio;
                 }
                 // Set the size of the images
                 // Set the offset of the piece (not centered, but at the top left of the square)
                 if (this->selected_piece &&
-                    piece_at->g_coord.x == this->selected_piece->g_coord.x &&
-                    piece_at->g_coord.y == this->selected_piece->g_coord.y) {
+                    board[x][y]->g_coord.x == this->selected_piece->g_coord.x &&
+                    board[x][y]->g_coord.y == this->selected_piece->g_coord.y) {
                     // Move selected piece to a coordinate and center it on the mouse
                     SDL_Point clickOffset;
                     rect.x = this->mouse_pos.x - (rect.w)/2;
                     rect.y = this->mouse_pos.y - (rect.h)/2;
                 } else {
+                    // Swap so we render up down instead of left right
                     rect.x = (y * (size + 1)) + x_offset;
                     rect.y = (x * (size + 1)) + y_offset;
                     // Center the piece in the box
@@ -189,16 +186,6 @@ int Renderer::HandleInput(SDL_Event* event) {
         this->mouse_pos = { event->motion.x, event->motion.y };
     case SDL_MOUSEBUTTONDOWN:
         if (!this->mouse_down && event->button.button == SDL_BUTTON_LEFT) {
-            for (int x = 0; x < 8; x++) {
-                for (int y = 0; y < 8; y++) {
-                    Piece* piece = this->empty_spots[x][y];
-                    Piece* p2 = this->board->g_game_board[x][y];
-                    if (SDL_PointInRect(&this->mouse_pos, &piece->g_box)) {
-                        LOG_F(ERROR, "Clicked on(%i, %i) [%i, %i]: (0x%0.4x) (%i, %i)", piece->g_coord.x, piece->g_coord.y, p2->g_coord.x, p2->g_coord.y, piece->g_piece, x, y);
-                        break;
-                    }
-                }
-            }
             this->mouse_down = true;
             for (int x = 0; x < 8; x++) {
                 for (int y = 0; y < 8; y++) {
@@ -206,7 +193,6 @@ int Renderer::HandleInput(SDL_Event* event) {
                         break;
                     Piece* piece = this->board->g_game_board[x][y];
                     if (SDL_PointInRect(&this->mouse_pos, &piece->g_box)) {
-                        LOG_F(INFO, "Grabbed piece at (%i, %i)", piece->g_coord.x, piece->g_coord.y);
                         this->selected_piece = piece;
                         break;
                     }
@@ -249,7 +235,6 @@ void Renderer::MouseUp(SDL_Event* event) {
                 /* Check if player dropped it on an empty box */
                 SDL_PointInRect(&this->mouse_pos, &this->empty_spots[x][y]->g_box)) {
                 dropped_box = this->empty_spots[y][x];
-                LOG_F(INFO, "Dropped piece at (%i, %i)", dropped_box->X(), dropped_box->Y());
                 break;
             }
         }

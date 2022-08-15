@@ -17,20 +17,29 @@ Piece* GetPiece(int value, int x, int y, int side) {
 	default:
 		LOG_F(ERROR, "Unkown piece |0x%0.4x|", value);
 	}
+	return NULL;
 }
 
-Board::Board() {
+Board::Board(int side) {
 	// Create a vector with 8 rows and 8 columns, with the default value BLANK.
 	this->g_game_board = std::vector<std::vector<Piece*>>(
 		8,
 		std::vector<Piece*>(8)
 	);
+	this->g_board_colors = std::vector<std::vector<int>>(
+		8,
+		std::vector<int>(8)
+	);
 	int backrank[8] = {ROOK, BISHOP, KNIGHT, QUEEN, KING, KNIGHT, BISHOP, ROOK};
+
+	int playing = side;
+	int other = (playing == WHITE) ? BLACK : WHITE;
+
 	for (int i = 0; i < 8; i++) {
-		this->g_game_board[1][i] = new Pawn(1, i, WHITE);
-		this->g_game_board[6][i] = new Pawn(6, i, BLACK);
-		this->g_game_board[7][i] = GetPiece(backrank[i], 7, i, BLACK);
-		this->g_game_board[0][i] = GetPiece(backrank[i], 0, i, WHITE);
+		this->g_game_board[1][i] = new Pawn(1, i, playing);
+		this->g_game_board[6][i] = new Pawn(6, i, other);
+		this->g_game_board[7][i] = GetPiece(backrank[i], 7, i, other);
+		this->g_game_board[0][i] = GetPiece(backrank[i], 0, i, playing);
 	}
 	for (int x = 2; x < 6; x++) {
 		for (int y = 0; y < 8; y++) {
@@ -42,6 +51,13 @@ Board::Board() {
 			this->g_game_board[x][y]->g_coord = { x, y };
 		}
 	}
+
+	for (int x = 0; x < 8; x++) {
+		for (int y = 0; y < 8; y++) {
+			this->g_board_colors[x][y] = ((x + y) % 2 == 0) ? other : playing;
+		}
+	}
+
 }
 
 void Board::PrintBoard() {
@@ -68,33 +84,26 @@ Piece* Board::At(int x, int y) {
 int Board::Move(int startX, int startY, int toX, int toY) {
 	Piece* start = At(startX, startY);
 	Piece* end = At(toX, toY);
-	LOG_F(INFO, "Moving from (%i, %i): (0x%0.4x) to (%i, %i): (0x%0.4x).", startX, startY, start->g_piece, toX, toY, end->g_piece);
+
 	if (start == NULL || end == NULL) {
-		LOG_F(ERROR, "Trying to access out of board boundary!");
+		LOG_F(ERROR, "You tried to place a piece outside of the board. How is this possible?");
 		return OUT_OF_BOUNDS;
 	}
 	if (start->g_side == end->g_side && end->g_piece != EMPTY) {
-		LOG_F(WARNING, "Trying to capture same sided piece from (%i, %i) to (%i, %i)!", startX, startY, toX, toY);
+		LOG_F(ERROR, "You can't capture your own piece you idiot.");
 		return SAME_SIDE_CAPTURE;
 	}
-	if (!start->Move(end->X(), end->Y())) {
-		LOG_F(WARNING, "Moving piece illegally from (%i, %i) to (%i, %i)!", startX, startY, toX, toY);
+	if (!start->Move(end->X(), end->Y(), this->GetBoard())) {
+		LOG_F(ERROR, "Do you know how to play chess?");
 		return ILLEGAL_PIECE_MOVE;
 	}
+
+	// Clear out memory
 	delete(this->g_game_board[toX][toY]);
 	this->g_game_board[toX][toY] = start->Clone();
 	this->g_game_board[toX][toY]->g_coord = { toX, toY };
 	delete(this->g_game_board[startX][startY]);
 	this->g_game_board[startX][startY] = new Empty(startX, startY, EMPTY);
+
 	return SUCCESS;
 }
-
-// Just made these incase I wanted to make it easier on myself
-// I could make this more efficient but who cares
-//int Board::Move(Vector2 start, Vector2 end) {
-//	return Move(start.x, start.y, end.x, end.y);
-//}
-//
-//int Board::Move(Piece* start, Piece* end) {
-//	return Move(start->g_coord, end->g_coord);
-//}

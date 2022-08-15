@@ -5,7 +5,7 @@ class King : public Piece
 {
 public:
 	King(int x, int y, int side);
-	std::vector<Vector2> GetValidMoves();
+	std::vector<Vector2> GetValidMoves(std::vector<std::vector<Piece*>> board);
 	Piece* Clone();
 };
 

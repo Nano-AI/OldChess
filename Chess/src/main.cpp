@@ -12,15 +12,15 @@ int main(int argc, char* argv[]) {
 	loguru::init(argc, argv);
 	loguru::add_file("Chess.log", loguru::Append, loguru::Verbosity_MAX);
 
-	Board board;
+	// Play as white or black
+	Board board(BLACK);
 	Window win(800, 800, "Chess");
-	// Render from white's perspective
-	Renderer render(&win, &board, WHITE);
+	Renderer render(&win, &board);
 	SDL_Event event;
 
 	bool done = false;
 
-	board.PrintBoard();	
+	//board.PrintBoard();	
 
 	while ((!done) && (SDL_WaitEvent(&event))) {
 		//render.Update();
@@ -28,8 +28,6 @@ int main(int argc, char* argv[]) {
 		render.Render();
 		win.HandleInput(&event);
 		// Render handles window resize
-		// :/
-		//LOG_F(ERROR, "RAAHHHHH");
 		switch (event.type) {
 		case SDL_QUIT:
 			done = true;

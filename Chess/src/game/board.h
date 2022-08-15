@@ -18,10 +18,11 @@
 class Board
 {
 public:
-	Board();
-	void PrintBoard();
 	std::vector<std::vector<Piece*>> GetBoard();
 	std::vector<std::vector<Piece*>> g_game_board;
+	std::vector<std::vector<int>> g_board_colors;
+	Board(int side);
+	void PrintBoard();
 	int Move(int startX, int startY, int toX, int toY);
 	/*int Move(Vector2 start, Vector2 end);
 	int Move(Piece* start, Piece* end);*/

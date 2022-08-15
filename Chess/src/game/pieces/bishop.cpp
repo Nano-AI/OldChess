@@ -7,7 +7,7 @@ Bishop::Bishop(int x, int y, int side) : Piece(x, y, side) {
 	this->g_piece = BISHOP | side;
 }
 
-std::vector<Vector2> Bishop::GetValidMoves() {
+std::vector<Vector2> Bishop::GetValidMoves(std::vector<std::vector<Piece*>> board) {
 	std::vector<Vector2> moves;
 	if (this->g_first_move) {
 		moves.push_back({ X(), Y() + 2 });

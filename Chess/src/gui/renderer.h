@@ -16,11 +16,11 @@ class Renderer
 {
 public:
 	bool pov_white;
-	Renderer(Window* win, Board* board, int render_side);
+	Renderer(Window* win, Board* board);
 	void Render(bool filter_event = false);
 	void Update();
-	void DrawBoard(bool pov_white = true);
-	void DrawPieces(bool pov_white = true);
+	void DrawBoard();
+	void DrawPieces();
 	int HandleInput(SDL_Event* event);
 private:
 	Image images;
@@ -30,6 +30,7 @@ private:
 	bool mouse_down;
 	Piece* selected_piece;
 	std::vector<std::vector<Empty*>> empty_spots;
+	std::map<int, Vector2> sizes;
 	void MouseUp(SDL_Event* event);
 	//int FilterEvent(void* userdata, SDL_Event* event);
 };

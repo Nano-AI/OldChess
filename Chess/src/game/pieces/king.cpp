@@ -7,7 +7,7 @@ King::King(int x, int y, int side) : Piece(x, y, side) {
 	this->g_piece = KING | side;
 }
 
-std::vector<Vector2> King::GetValidMoves() {
+std::vector<Vector2> King::GetValidMoves(std::vector<std::vector<Piece*>> board) {
 	std::vector<Vector2> moves;
 	return moves;
 }

@@ -6,7 +6,8 @@ Window::Window(int width, int height, std::string title) {
 	LOG_F(INFO, "Initializing SDL2 window. %ix%i, \"%s\"", width, height, title.c_str());
 	// Setup video and audio
 	if ((SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO) < 0)) {
-		LOG_F(ERROR, "Error initializing SDL2: %s.\n", SDL_GetError());
+		LOG_F(ERROR, "Error initializing SDL2. Error:");
+		LOG_F(FATAL, "%s", SDL_GetError());
 		exit(-1);
 	}
 	LOG_F(INFO, "Creating window.");
@@ -19,14 +20,15 @@ Window::Window(int width, int height, std::string title) {
 	SDL_Surface* screenSurface = SDL_GetWindowSurface(window);
 	SDL_Renderer* renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
 	if (window == NULL) {
-		LOG_F(ERROR, "Error creating window. Error: %s\n", SDL_GetError());
+		LOG_F(ERROR, "Error creating window. Error:");
+		LOG_F(FATAL, "%s", SDL_GetError());
 		exit(-1);
 	}
 	// Window surface, renderer, and window set
 	this->g_window = window;
 	this->g_surface = screenSurface;
 	this->g_renderer = renderer;
-	LOG_F(INFO, "SDL initialized.\n");
+	LOG_F(INFO, "SDL initialized.");
 }
 
 void Window::Quit(int error_num) {
@@ -35,7 +37,7 @@ void Window::Quit(int error_num) {
 	SDL_DestroyWindow(g_window);
 	g_window = NULL;
 	SDL_Quit();
-	LOG_F(INFO, "Quitting...\n");
+	LOG_F(INFO, "Quitting...");
 	exit(error_num);
 }
 
@@ -47,5 +49,5 @@ void Window::ResizeWindow(int width, int height) {
 	SDL_SetWindowSize(this->g_window, width, height);
 	this->g_width = width;
 	this->g_height = height;
-	LOG_F(INFO, "Window resized to %dx%d.\n", width, height);
+	LOG_F(INFO, "Window resized to %dx%d.", width, height);
 }
