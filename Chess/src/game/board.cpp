@@ -2,8 +2,6 @@
 
 Piece* GetPiece(int value, int x, int y, int side) {
 	switch (value) {
-	case PAWN:
-		return new Pawn(x, y, side);
 	case BISHOP:
 		return new Bishop(x, y, side);
 	case KNIGHT:
@@ -30,14 +28,16 @@ Board::Board(int side) {
 		8,
 		std::vector<int>(8)
 	);
-	int backrank[8] = {ROOK, BISHOP, KNIGHT, QUEEN, KING, KNIGHT, BISHOP, ROOK};
+	int backrank[8] = {ROOK, KNIGHT, BISHOP, QUEEN, KING, BISHOP, KNIGHT, ROOK};
 
 	int playing = side;
 	int other = (playing == WHITE) ? BLACK : WHITE;
 
 	for (int i = 0; i < 8; i++) {
-		this->g_game_board[1][i] = new Pawn(1, i, playing);
-		this->g_game_board[6][i] = new Pawn(6, i, other);
+		// Piece is going up towards the top
+		this->g_game_board[1][i] = new Pawn(1, i, playing, 1);
+		// Piece is going down towards the bottom
+		this->g_game_board[6][i] = new Pawn(6, i, other, -1);
 		this->g_game_board[7][i] = GetPiece(backrank[i], 7, i, other);
 		this->g_game_board[0][i] = GetPiece(backrank[i], 0, i, playing);
 	}
@@ -98,12 +98,18 @@ int Board::Move(int startX, int startY, int toX, int toY) {
 		return ILLEGAL_PIECE_MOVE;
 	}
 
+	// Because we don't discriminate in the game of chess!
+	if (this->g_game_board[startX][startY]->g_piece == WPAWN || 
+		this->g_game_board[startX][startY]->g_piece == BPAWN) {
+		g_game_board[startX][startY]->g_first_move = false;
+	}
+
 	// Clear out memory
 	delete(this->g_game_board[toX][toY]);
 	this->g_game_board[toX][toY] = start->Clone();
 	this->g_game_board[toX][toY]->g_coord = { toX, toY };
 	delete(this->g_game_board[startX][startY]);
 	this->g_game_board[startX][startY] = new Empty(startX, startY, EMPTY);
-
+	
 	return SUCCESS;
 }

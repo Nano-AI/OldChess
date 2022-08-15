@@ -1,24 +1,41 @@
 #include "pawn.h"
 
-Pawn::Pawn(int x, int y, int side) : Piece(x, y, side) {
+// 1 is up, -1 is down.
+Pawn::Pawn(int x, int y, int side, int direction) : Piece(x, y, side) {
 	this->g_is_king = false;
 	this->g_is_white = side == WHITE;
 	this->g_first_move = true;
 	this->g_piece = PAWN | side;
+	this->direction = direction;
 }
 
 std::vector<Vector2> Pawn::GetValidMoves(std::vector<std::vector<Piece*>> board) {
 	std::vector<Vector2> moves;
 	int x = this->g_coord.x;
 	int y = this->g_coord.y;
-	int direction = (this->IsWhite()) ? -1 : 1;
-	moves.push_back({ x + direction, y });
-	/*if (g_first_move) {
-		moves.push_back({ x + (2 * direction), y});
-	}*/
+	if (x > 0 && x < 8) {
+		if (board[x + this->direction][y]->g_piece == EMPTY) {
+			moves.push_back({ x + this->direction, y });
+			if (this->g_first_move && board[x + 2 * this->direction][y]->g_piece == EMPTY) {
+				moves.push_back({ x + (2 * direction), y});
+				// This doesn't work here so it's been moved to the board's move function.
+				// this->g_first_move = false;
+			}
+		}
+		if (y > 0 && y < 8) {
+			if (board[x + this->direction][y + 1]->g_piece != EMPTY) {
+				moves.push_back({ x + this->direction, y + 1 });
+			}
+			if (board[x + this->direction][y - 1]->g_piece != EMPTY) {
+				moves.push_back({ x + this->direction, y - 1 });
+			}
+		}
+	}
 	return moves;
 }
 
 Piece* Pawn::Clone() {
-	return new Pawn(X(), Y(), this->g_side);
+	Pawn* copy = new Pawn(X(), Y(), this->g_side, this->direction);
+	copy->g_first_move = this->g_first_move;
+	return copy;
 }

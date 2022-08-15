@@ -21,6 +21,7 @@ public:
 	void Update();
 	void DrawBoard();
 	void DrawPieces();
+	void DrawMoves() ;
 	int HandleInput(SDL_Event* event);
 private:
 	Image images;

@@ -35,8 +35,8 @@ class Pieces {
 public:
 	inline static std::map<std::string, int> c_name_binary = {
 		{ "Pawn"  , PAWN   },
-		{ "Bishop", KNIGHT },
-		{ "Knight", BISHOP },
+		{ "Bishop", BISHOP },
+		{ "Knight", KNIGHT },
 		{ "Rook"  , ROOK   },
 		{ "Queen" , QUEEN  },
 		{ "King"  , KING   }

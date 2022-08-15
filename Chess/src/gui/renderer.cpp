@@ -1,13 +1,16 @@
 #include "renderer.h"
 #define INNER_PADDING 10
 
+void DrawCircle(SDL_Renderer* renderer, int x, int y, int radius, SDL_Color color);
 // Just colors for the board
+// I'll switch these to SDL_Color eventually.
 static int light_square_rgb[3] = { 243, 242, 242 };
-static int dark_square_rgb[3] = { 125, 135, 150 };
-static int background_rgb[3] = { 100, 100, 100 };
+static int dark_square_rgb[3]  = { 125, 135, 150 };
+static int background_rgb[3]   = { 100, 100, 100 };
+static int move_color[4]       = { 180, 200, 155, 200 };
 
-const char* c_white_dir = ".\\resources\\pieces\\white";
-const char* c_black_dir = ".\\resources\\pieces\\black";
+const char* c_white_dir = "./resources/pieces/white";
+const char* c_black_dir = "./resources/pieces/black";
 
 int FilterEvent(void* userdata, SDL_Event* event);
 
@@ -80,6 +83,7 @@ void Renderer::Render(bool filter_event) {
     }
     SDL_RenderClear(this->win->g_renderer);
     DrawBoard();
+    DrawMoves();
     DrawPieces();
     //DrawPossibleMoves(this->pov_white);
     SDL_RenderPresent(this->win->g_renderer);
@@ -105,7 +109,6 @@ void Renderer::DrawBoard() {
                 SDL_SetRenderDrawColor(render, light_square_rgb[0], light_square_rgb[1], light_square_rgb[2], 255);
             } else {
                 SDL_SetRenderDrawColor(render, dark_square_rgb[0], dark_square_rgb[1], dark_square_rgb[2], 255);
-
             }
             SDL_RenderFillRect(render, &rect);
         }
@@ -126,9 +129,6 @@ void Renderer::DrawPieces() {
     for (int x = 0; x < 8; x++) {
         for (int y = 0; y < 8; y++) {
             if (board[x][y]->g_piece != BLANK) {
-                // I have to do this because somewhere in my code, the coordinates get updated to the wrong ones.
-                // board[x][y]->g_coord = { x, y };
-                // Find the texture of the current piece
                 auto piece = loaded_pieces.find(board[x][y]->g_piece);
                 auto image_size = this->sizes.find(board[x][y]->g_piece);
                 SDL_Rect rect;
@@ -169,6 +169,50 @@ void Renderer::DrawPieces() {
                 }
             }
         }
+    }
+}
+
+void Renderer::DrawMoves() {
+    if (!this->selected_piece) {
+        return;
+    }
+    std::vector<Vector2> moves = this->selected_piece->GetValidMoves(this->board->g_game_board);
+
+    RenderMathValues values = CalculateDetails(this->win);
+    int size = values.size;
+    int x_offset = values.x_offset;
+    int y_offset = values.y_offset;
+
+    SDL_Renderer* render = this->win->g_renderer;
+    SDL_Surface* surface = this->win->g_surface;
+
+    int circle_size = size / 8;
+
+    for (Vector2 move : moves) {
+        int x = move.x;
+        int y = move.y;
+        if (x >= 8 || x < 0 || y >= 8 || y < 0) {
+            continue;
+        }
+        SDL_SetRenderDrawBlendMode(render, SDL_BLENDMODE_BLEND);
+        if (this->board->At(x, y)->g_piece == EMPTY) {
+            DrawCircle(render,
+                (y * (size + 1)) + x_offset + (size / 2),
+                (x * (size + 1)) + y_offset + (size / 2),
+                circle_size,
+                { 180, 200, 155, 200 }
+            );
+        } else {
+            SDL_Rect rect;
+            rect.x = (y * (size + 1) + x_offset);
+            rect.y = (x * (size + 1) + y_offset);
+            rect.w = size + 1;
+            rect.h = size + 1;
+            SDL_SetRenderDrawColor(render, move_color[0], move_color[1], move_color[2], move_color[3]);
+            SDL_RenderFillRect(render, &rect);
+            SDL_RenderDrawRect(render, &rect);
+        }
+        SDL_SetRenderDrawBlendMode(render, SDL_BLENDMODE_NONE);
     }
 }
 
@@ -248,6 +292,7 @@ void Renderer::MouseUp(SDL_Event* event) {
     this->board->Move(start.x, start.y, end.x, end.y);
 }
 
+
 int FilterEvent(void* userdata, SDL_Event* event) {
     if (event->type == SDL_WINDOWEVENT && event->window.event == SDL_WINDOWEVENT_RESIZED) {
         // convert userdata pointer to yours and trigger your own draw function
@@ -259,4 +304,20 @@ int FilterEvent(void* userdata, SDL_Event* event) {
     }
     //important to allow all events, or your SDL_PollEvent doesn't get any event
     return 1;
+}
+
+void DrawCircle(SDL_Renderer *renderer, int x, int y, int radius, SDL_Color color) {
+    SDL_SetRenderDrawColor(renderer, color.r, color.g, color.b, color.a);
+    for (int w = 0; w < radius * 2; w++)
+    {
+        for (int h = 0; h < radius * 2; h++)
+        {
+            int dx = radius - w; // horizontal offset
+            int dy = radius - h; // vertical offset
+            if ((dx*dx + dy*dy) <= (radius * radius))
+            {
+                SDL_RenderDrawPoint(renderer, x + dx, y + dy);
+            }
+        }
+    }
 }
