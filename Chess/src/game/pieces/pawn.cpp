@@ -13,6 +13,7 @@ std::vector<Vector2> Pawn::GetValidMoves(std::vector<std::vector<Piece*>> board)
 	std::vector<Vector2> moves;
 	int x = this->g_coord.x;
 	int y = this->g_coord.y;
+	Piece* current;
 	if (x > 0 && x < 8) {
 		if (board[x + this->direction][y]->g_piece == EMPTY) {
 			moves.push_back({ x + this->direction, y });
@@ -23,11 +24,11 @@ std::vector<Vector2> Pawn::GetValidMoves(std::vector<std::vector<Piece*>> board)
 			}
 		}
 		if (y > 0 && y < 8) {
-			if (board[x + this->direction][y + 1]->g_piece != EMPTY) {
-				moves.push_back({ x + this->direction, y + 1 });
-			}
-			if (board[x + this->direction][y - 1]->g_piece != EMPTY) {
-				moves.push_back({ x + this->direction, y - 1 });
+			for (int i = -1; i <= 1; i += 2) {
+				Piece* current = board[x + this->direction][y + 1 * i];
+				if (current->g_piece != EMPTY && current->g_side != this->g_side) {
+					moves.push_back(current->GetCoord());
+				}
 			}
 		}
 	}
