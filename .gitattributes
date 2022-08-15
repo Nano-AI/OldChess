@@ -1,0 +1,4 @@
+* linguist-vendored
+*.cpp linguist-vendored=false
+*.c linguist-detectable=false
+*.c linguist-language=C++
