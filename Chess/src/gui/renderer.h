@@ -9,6 +9,7 @@
 #include "window.h"
 #include "image.h"
 #include "../game/board.h"
+#include "./sound.h"
 
 namespace fs = std::filesystem;
 
@@ -24,6 +25,8 @@ class Renderer
 public:
 	bool pov_white;
 	Renderer(Window* win, Board* board);
+	bool UpdateMoves();
+	void ClearMoves();
 	void Render(bool filter_event = false);
 	void Update();
 	void DrawBoard();
@@ -32,11 +35,12 @@ public:
 	void DrawPiece(Piece* piece, SDL_Texture* piece_texture, Vector2 image_size, RenderMathValues values);
 	int HandleInput(SDL_Event* event);
 private:
+	bool mouse_down;
+	Sound* sound;
 	Image images;
 	Window* win;
 	Board* board;
 	SDL_Point mouse_pos;
-	bool mouse_down;
 	Piece* selected_piece;
 	std::vector<std::vector<Empty*>> empty_spots;
 	std::vector<std::vector<std::vector<Vector2>>> moves;

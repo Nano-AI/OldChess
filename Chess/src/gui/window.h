@@ -12,6 +12,7 @@ public:
 	SDL_Window* g_window;
 	SDL_Surface* g_surface;
 	SDL_Renderer* g_renderer;
+
 	Window(int height, int width, std::string title);
 	void Quit(int error_num);
 	void HandleInput(SDL_Event* event);
