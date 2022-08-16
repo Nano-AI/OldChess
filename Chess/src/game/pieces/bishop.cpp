@@ -23,6 +23,9 @@ std::vector<Vector2> Bishop::GetValidMoves(std::vector<std::vector<Piece*>> boar
 				if (board[new_x][new_y]->g_side == this->g_side && board[new_x][new_y]->g_piece != BLANK) {
 					break;
 				}
+				if (board[new_x][new_y]->g_is_king) {
+					break;
+				}
 				Piece* at = board[new_x][new_y];
 				moves.push_back({ new_x, new_y });
 				if (board[new_x][new_y]->g_piece != BLANK) {

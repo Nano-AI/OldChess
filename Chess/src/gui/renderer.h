@@ -26,7 +26,7 @@ public:
 	bool pov_white;
 	Renderer(Window* win, Board* board);
 	~Renderer();
-	bool UpdateMoves();
+	void UpdateMoves();
 	void ClearMoves();
 	void Render(bool filter_event = false);
 	void Update();
@@ -44,7 +44,9 @@ private:
 	SDL_Point mouse_pos;
 	Piece* selected_piece;
 	std::vector<std::vector<Empty*>> empty_spots;
-	std::vector<std::vector<std::vector<Vector2>>> moves;
+	std::vector<std::vector<
+		std::vector<Vector2>
+	>> moves;
 	std::map<int, Vector2> sizes;
 	void MouseUp(SDL_Event* event);
 	//int FilterEvent(void* userdata, SDL_Event* event);

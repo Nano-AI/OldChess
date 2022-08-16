@@ -18,6 +18,9 @@ std::vector<Vector2> Rook::GetValidMoves(std::vector<std::vector<Piece*>> board)
 			if (current->g_side == this->g_side && current->g_piece != EMPTY) {
 				break;
 			}
+			if (current->g_is_king) {
+				break;
+			}
 			moves.push_back({ i, y });
 			if (current->g_piece != EMPTY) {
 				break;
@@ -30,6 +33,9 @@ std::vector<Vector2> Rook::GetValidMoves(std::vector<std::vector<Piece*>> board)
 		while (i >= 0 && i < 8) {
 			Piece* current = board[x][i];
 			if (current->g_side == this->g_side && current->g_piece != EMPTY) {
+				break;
+			}
+			if (current->g_is_king) {
 				break;
 			}
 			moves.push_back({ x, i });

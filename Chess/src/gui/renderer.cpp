@@ -64,17 +64,18 @@ Renderer::Renderer(Window* win, Board* board) : win(this->win), board(this->boar
 	this->moves = std::vector<std::vector<std::vector<Vector2>>>(
 		8,
 		std::vector<std::vector<Vector2>>(8)
-		);
+	);
 
 	// Setup the empty spaces
 	for (int x = 0; x < 8; x++) {
 		for (int y = 0; y < 8; y++) {
 			this->empty_spots[x][y] = new Empty(x, y, EMPTY);
+			this->moves[x][y] = std::vector<Vector2>();
 		}
 	}
 
 	this->sound = new Sound();
-
+	UpdateMoves();
 	LOG_F(INFO, "Setup renderer.");
 }
 
@@ -199,27 +200,32 @@ void Renderer::DrawPiece(Piece* piece, SDL_Texture* piece_texture, Vector2 image
 	SDL_RenderCopy(this->win->g_renderer, piece_texture, NULL, &rect);
 }
 
-bool Renderer::UpdateMoves() {
-	if (!this->selected_piece) {
-		return false;
-	}
-
-	int sx = this->selected_piece->X();
-	int sy = this->selected_piece->Y();
-
-	std::vector<Vector2> piece_moves = this->moves[sx][sy];
-
-	if (piece_moves.size() == 0) {
-		std::vector<Vector2> mvs = this->selected_piece->GetValidMoves(this->board->g_game_board);
-		if (mvs.size() == 0) {
-			mvs.push_back({ NULL, NULL });
+void Renderer::UpdateMoves() {
+	King* white = NULL;
+	King* black = NULL;
+	for (int x = 0; x < 8; x++) {
+		for (int y = 0; y < 8; y++) {
+			if (this->board->At(x, y)->g_is_king) {
+				if (this->board->At(x, y)->g_side == WHITE) {
+					white = (King*) this->board->At(x, y);
+				}
+				else {
+					black = (King*) this->board->At(x, y);
+				}
+				continue;
+			}
+			Piece* current = this->board->g_game_board[x][y];
+			this->moves[x][y] = this->board->At(x, y)->GetValidMoves(this->board->g_game_board);
 		}
-		this->moves[sx][sy] = mvs;
-		return true;
 	}
-	else if (piece_moves.size() == 1 && piece_moves[0].x == NULL && piece_moves[0].y == NULL) {
-		return false;
+	if (!white || !black) {
+		LOG_F(ERROR, "White and/or black king's is/are missing!");
+		return;
 	}
+	white->moves = this->moves;
+	black->moves = this->moves;
+	this->moves[white->X()][white->Y()] = white->GetValidMoves(this->board->g_game_board);
+	this->moves[black->X()][black->Y()] = black->GetValidMoves(this->board->g_game_board);
 }
 
 void Renderer::ClearMoves() {
@@ -231,11 +237,9 @@ void Renderer::ClearMoves() {
 }
 
 void Renderer::DrawMoves() {
-	bool should_render = UpdateMoves();
-	if (!should_render) {
+	if (!this->selected_piece) {
 		return;
 	}
-
 	int sx = this->selected_piece->X(), sy = this->selected_piece->Y();
 
 	RenderMathValues values = CalculateDetails(this->win);
@@ -361,6 +365,7 @@ void Renderer::MouseUp(SDL_Event* event) {
 			this->sound->PlaySound("move");
 		}
 		ClearMoves();
+		UpdateMoves();
 	}
 }
 

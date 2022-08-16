@@ -33,6 +33,9 @@ std::vector<Vector2> Pawn::GetValidMoves(std::vector<std::vector<Piece*>> board)
 					LOG_F(ERROR, "Current was null.");
 					continue;
 				}
+				if (current->g_is_king) {
+					continue;
+				}
 				if (current->g_piece != EMPTY && current->g_side != this->g_side) {
 					moves.push_back(current->GetCoord());
 				}
