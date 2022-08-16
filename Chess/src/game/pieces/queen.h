@@ -1,5 +1,7 @@
 #pragma once
 #include "../piece.h"
+#include "./bishop.h"
+#include "./rook.h"
 
 class Queen : public Piece
 {

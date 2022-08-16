@@ -12,6 +12,13 @@
 
 namespace fs = std::filesystem;
 
+struct RenderMathValues {
+    int shortest;
+    int size;
+    int x_offset;
+    int y_offset;
+};
+
 class Renderer
 {
 public:
@@ -22,6 +29,7 @@ public:
 	void DrawBoard();
 	void DrawPieces();
 	void DrawMoves() ;
+	void DrawPiece(Piece* piece, SDL_Texture* piece_texture, Vector2 image_size, RenderMathValues values);
 	int HandleInput(SDL_Event* event);
 private:
 	Image images;
@@ -31,6 +39,7 @@ private:
 	bool mouse_down;
 	Piece* selected_piece;
 	std::vector<std::vector<Empty*>> empty_spots;
+	std::vector<std::vector<std::vector<Vector2>>> moves;
 	std::map<int, Vector2> sizes;
 	void MouseUp(SDL_Event* event);
 	//int FilterEvent(void* userdata, SDL_Event* event);

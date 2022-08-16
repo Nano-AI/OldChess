@@ -1,5 +1,6 @@
 #pragma once
 #include "../piece.h"
+#include <loguru.hpp>
 
 class Pawn : public Piece
 {

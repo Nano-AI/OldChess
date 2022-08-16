@@ -23,9 +23,16 @@ std::vector<Vector2> Pawn::GetValidMoves(std::vector<std::vector<Piece*>> board)
 				// this->g_first_move = false;
 			}
 		}
-		if (y > 0 && y < 8) {
+		if (y >= 0 && y < 8) {
 			for (int i = -1; i <= 1; i += 2) {
-				Piece* current = board[x + this->direction][y + 1 * i];
+				if (x + this->direction < 0 || x + this->direction > 7 || y + i < 0 || y + i > 7) {
+					continue;
+				}
+				Piece* current = board[x + this->direction][y + i];
+				if (!current) {
+					LOG_F(ERROR, "Current was null.");
+					continue;
+				}
 				if (current->g_piece != EMPTY && current->g_side != this->g_side) {
 					moves.push_back(current->GetCoord());
 				}

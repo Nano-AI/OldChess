@@ -12,6 +12,7 @@ std::vector<Vector2> Bishop::GetValidMoves(std::vector<std::vector<Piece*>> boar
 	int x = this->X();
 	int y = this->Y();
 	bool top_right = true, top_left = true, bottom_right = true, bottom_left = true;
+	// Would've been better to just use 4 while loops...
 	for (int j = -1; j <= 1; j += 2) {
 		for (int i = -1; i <= 1; i += 2) {
 			for (int k = 1; k < 8; k++) {

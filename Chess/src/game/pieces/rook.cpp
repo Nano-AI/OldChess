@@ -9,6 +9,36 @@ Rook::Rook(int x, int y, int side) : Piece(x, y, side) {
 
 std::vector<Vector2> Rook::GetValidMoves(std::vector<std::vector<Piece*>> board) {
 	std::vector<Vector2> moves;
+	int x = X();
+	int y = Y();
+	for (int d = -1; d <= 1; d += 2) {
+		int i = x + d;
+		while (i >= 0 && i < 8) {
+			Piece* current = board[i][y];
+			if (current->g_side == this->g_side && current->g_piece != EMPTY) {
+				break;
+			}
+			moves.push_back({ i, y });
+			if (current->g_piece != EMPTY) {
+				break;
+			}
+			i += d;
+		}
+	}
+	for (int d = -1; d <= 1; d += 2) {
+		int i = y + d;
+		while (i >= 0 && i < 8) {
+			Piece* current = board[x][i];
+			if (current->g_side == this->g_side && current->g_piece != EMPTY) {
+				break;
+			}
+			moves.push_back({ x, i });
+			if (current->g_piece != EMPTY) {
+				break;
+			}
+			i += d;
+		}
+	}
 	return moves;
 }
 

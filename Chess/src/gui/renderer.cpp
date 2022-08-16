@@ -14,13 +14,6 @@ const char* c_black_dir = "./resources/pieces/black";
 
 int FilterEvent(void* userdata, SDL_Event* event);
 
-struct RenderMathValues {
-    int shortest;
-    int size;
-    int x_offset;
-    int y_offset;
-};
-
 bool CoordEqual(Vector2* point1, Vector2* point2) {
     return point1->x == point2->x && point1->y == point2->y;
 }
@@ -67,6 +60,11 @@ Renderer::Renderer(Window* win, Board* board) : win(this->win), board(this->boar
         std::vector<Empty*>(8)
     );
 
+    this->moves = std::vector<std::vector<std::vector<Vector2>>>(
+        8,
+        std::vector<std::vector<Vector2>>(8)
+    );
+
     // Setup the empty spaces
     for (int x = 0; x < 8; x++) {
         for (int y = 0; y < 8; y++) {
@@ -85,6 +83,7 @@ void Renderer::Render(bool filter_event) {
     DrawBoard();
     DrawMoves();
     DrawPieces();
+    SDL_SetRenderDrawColor(this->win->g_renderer, background_rgb[0], background_rgb[1], background_rgb[2], 255);
     //DrawPossibleMoves(this->pov_white);
     SDL_RenderPresent(this->win->g_renderer);
 }
@@ -122,61 +121,85 @@ void Renderer::DrawPieces() {
     auto render = this->win->g_renderer;
 
     auto values = CalculateDetails(this->win);
-    auto size = values.size;
-    auto x_offset = values.x_offset;
-    auto y_offset = values.y_offset;
 
     for (int x = 0; x < 8; x++) {
         for (int y = 0; y < 8; y++) {
             if (board[x][y]->g_piece != BLANK) {
-                auto piece = loaded_pieces.find(board[x][y]->g_piece);
-                auto image_size = this->sizes.find(board[x][y]->g_piece);
-                SDL_Rect rect;
-                // Correct scaling to maintain aspect ratio of images
-                if (image_size->second.x > image_size->second.y) {
-                    float ratio = (float)image_size->second.x / (float)image_size->second.y;
-                    rect.w = size - 2 * INNER_PADDING;
-                    rect.h = rect.w / ratio;
-
-                } else {
-                    float ratio = (float)image_size->second.y / (float)image_size->second.x;
-                    rect.h = size - 2 * INNER_PADDING;
-                    rect.w = rect.h / ratio;
+                if (this->selected_piece && x == this->selected_piece->X() && y == this->selected_piece->Y()) {
+                    continue;
                 }
-                // Set the size of the images
-                // Set the offset of the piece (not centered, but at the top left of the square)
-                if (this->selected_piece &&
-                    board[x][y]->g_coord.x == this->selected_piece->g_coord.x &&
-                    board[x][y]->g_coord.y == this->selected_piece->g_coord.y) {
-                    // Move selected piece to a coordinate and center it on the mouse
-                    SDL_Point clickOffset;
-                    rect.x = this->mouse_pos.x - (rect.w)/2;
-                    rect.y = this->mouse_pos.y - (rect.h)/2;
-                } else {
-                    // Swap so we render up down instead of left right
-                    rect.x = (y * (size + 1)) + x_offset;
-                    rect.y = (x * (size + 1)) + y_offset;
-                    // Center the piece in the box
-                    rect.x += (size - rect.w) / 2;
-                    rect.y += (size - rect.h) / 2;
-                }
-                this->board->g_game_board[x][y]->g_box = rect;
-                if (piece == loaded_pieces.end()) {
-                    LOG_F(ERROR, "Error loading piece |0x%0.4x|", piece);
-                }
-                else {
-                    SDL_RenderCopy(render, piece->second, NULL, &rect);
-                }
+                Piece* current = board[x][y];
+                SDL_Texture* texture = loaded_pieces.find(current->g_piece)->second;
+                Vector2 size = this->sizes.find(current->g_piece)->second;
+                DrawPiece(current, texture, size, values);
             }
         }
     }
+
+    // Makes sure that the selected piece renders on top of others.
+    if (this->selected_piece) {
+        SDL_Texture* texture = loaded_pieces.find(this->selected_piece->g_piece)->second;
+        Vector2 size = this->sizes.find(this->selected_piece->g_piece)->second;
+        DrawPiece(this->selected_piece, texture, size, values);
+    }
+}
+
+void Renderer::DrawPiece(Piece* piece, SDL_Texture* piece_texture, Vector2 image_size, RenderMathValues values) {
+    int size = values.size, x_offset = values.x_offset, y_offset = values.y_offset, x = piece->X(), y = piece->Y();
+
+    SDL_Rect rect;
+    // Correct scaling to maintain aspect ratio of images
+    if (image_size.x > image_size.y) {
+        float ratio = (float)image_size.x / (float)image_size.y;
+        rect.w = size - 2 * INNER_PADDING;
+        rect.h = rect.w / ratio;
+    
+    } else {
+        float ratio = (float)image_size.y / (float)image_size.x;
+        rect.h = size - 2 * INNER_PADDING;
+        rect.w = rect.h / ratio;
+    }
+    // Set the size of the images
+    // Set the offset of the piece (not centered, but at the top left of the square)
+    if (this->selected_piece &&
+        piece->g_coord.x == this->selected_piece->g_coord.x &&
+        piece->g_coord.y == this->selected_piece->g_coord.y) {
+        // Move selected piece to a coordinate and center it on the mouse
+        SDL_Point clickOffset;
+        rect.x = this->mouse_pos.x - (rect.w)/2;
+        rect.y = this->mouse_pos.y - (rect.h)/2;
+    } else {
+        // Swap so we render up down instead of left right
+        rect.x = (y * (size + 1)) + x_offset;
+        rect.y = (x * (size + 1)) + y_offset;
+        // Center the piece in the box
+        rect.x += (size - rect.w) / 2;
+        rect.y += (size - rect.h) / 2;
+    }
+    piece->g_box = rect;
+    SDL_RenderCopy(this->win->g_renderer, piece_texture, NULL, &rect);
 }
 
 void Renderer::DrawMoves() {
     if (!this->selected_piece) {
         return;
     }
-    std::vector<Vector2> moves = this->selected_piece->GetValidMoves(this->board->g_game_board);
+
+    int sx = this->selected_piece->X();
+    int sy = this->selected_piece->Y();
+
+    std::vector<Vector2> piece_moves = this->moves[sx][sy];
+
+    if (piece_moves.size() == 0) {
+        std::vector<Vector2> mvs = this->selected_piece->GetValidMoves(this->board->g_game_board);
+        if (mvs.size() == 0) {
+            mvs.push_back({ NULL, NULL });
+        }
+        this->moves[sx][sy] = mvs;
+    }
+    else if (piece_moves.size() == 1 && piece_moves[0].x == NULL && piece_moves[0].y == NULL) {
+        return;
+    }
 
     RenderMathValues values = CalculateDetails(this->win);
     int size = values.size;
@@ -188,7 +211,7 @@ void Renderer::DrawMoves() {
 
     int circle_size = size / 8;
 
-    for (Vector2 move : moves) {
+    for (Vector2 move : this->moves[sx][sy]) {
         int x = move.x;
         int y = move.y;
         if (x >= 8 || x < 0 || y >= 8 || y < 0) {
@@ -289,7 +312,14 @@ void Renderer::MouseUp(SDL_Event* event) {
     Vector2 start = this->selected_piece->g_coord;
     Vector2 end = dropped_box->g_coord;
     // Honestly, I'm not sure why this is the way it is, but it works and I'm too lazy to make a proper implementation
-    this->board->Move(start.x, start.y, end.x, end.y);
+    int msg = this->board->Move(start.x, start.y, end.x, end.y);
+    if (msg == SUCCESS) {
+        for (int x = 0; x < 8; x++) {
+            for (int y = 0; y < 8; y++) {
+                this->moves[x][y].clear();
+            }
+        }
+    }
 }
 
 
