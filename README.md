@@ -1,1 +1,28 @@
-# Chess
+# Chess 
+
+Chess made in C++ using SDL2.
+
+## Description
+
+This is a small Chess project where you can play Chess against yourself. It's made using SDL2, SDL_image, SDL_mixer, and Loguru.
+
+## Getting Started
+
+### Dependencies
+
+Building requires Visual Studio 2022 to be installed.
+
+### Compiling
+Run `git clone https://github.com/Nano-AI/Chess && cd Chess`.
+
+Then open the `Chess.sln` file using Visual Studio 2022.
+
+From there you can compile, and run the code.
+
+### Installing
+
+If you want to download the program, the executable can be found [in the releases tab](https://github.com/Nano-AI/Chess/releases).
+
+## License
+
+This project is licensed under the MIT License - see the LICENSE.md file for details
