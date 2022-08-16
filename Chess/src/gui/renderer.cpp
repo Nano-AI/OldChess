@@ -128,15 +128,16 @@ void Renderer::DrawPieces() {
 
 	for (int x = 0; x < 8; x++) {
 		for (int y = 0; y < 8; y++) {
-			if (board[x][y]->g_piece != BLANK) {
-				if (this->selected_piece && x == this->selected_piece->X() && y == this->selected_piece->Y()) {
-					continue;
-				}
-				Piece* current = board[x][y];
-				SDL_Texture* texture = loaded_pieces.find(current->g_piece)->second;
-				Vector2 size = this->sizes.find(current->g_piece)->second;
-				DrawPiece(current, texture, size, values);
+			if (board[x][y]->g_piece == BLANK) {
+				continue;
 			}
+			if (this->selected_piece && x == this->selected_piece->X() && y == this->selected_piece->Y()) {
+				continue;
+			}
+			Piece* current = board[x][y];
+			SDL_Texture* texture = loaded_pieces.find(current->g_piece)->second;
+			Vector2 size = this->sizes.find(current->g_piece)->second;
+			DrawPiece(current, texture, size, values);
 		}
 	}
 
@@ -183,6 +184,14 @@ void Renderer::DrawPiece(Piece* piece, SDL_Texture* piece_texture, Vector2 image
 		rect.y += (size - rect.h) / 2;
 	}
 	piece->g_box = rect;
+	// TODO: Error being thrown here after playing too many moves
+	/*
+	Exception thrown at 0x00007FFECCDA48BF (SDL2.dll) in Chess.exe: 0xC0000005: Access violation reading location 0x0000024D00001011.
+	*/
+	if (!piece_texture || !&rect) {
+		LOG_F(ERROR, "Piece texture and/or rect is NULL.");
+		return;
+	}
 	SDL_RenderCopy(this->win->g_renderer, piece_texture, NULL, &rect);
 }
 
