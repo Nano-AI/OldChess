@@ -78,6 +78,10 @@ Renderer::Renderer(Window* win, Board* board) : win(this->win), board(this->boar
 	LOG_F(INFO, "Setup renderer.");
 }
 
+Renderer::~Renderer() {
+	delete(this->sound);
+}
+
 void Renderer::Render(bool filter_event) {
 	if (filter_event) {
 		SDL_GetWindowSize(win->g_window, &win->g_width, &win->g_height);

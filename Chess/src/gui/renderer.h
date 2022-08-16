@@ -25,6 +25,7 @@ class Renderer
 public:
 	bool pov_white;
 	Renderer(Window* win, Board* board);
+	~Renderer();
 	bool UpdateMoves();
 	void ClearMoves();
 	void Render(bool filter_event = false);
