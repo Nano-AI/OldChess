@@ -7,7 +7,7 @@ Empty::Empty(int x, int y, int side) : Piece(x, y, side) {
 	this->g_piece = EMPTY;
 }
 
-std::vector<Vector2> Empty::GetValidMoves(std::vector<std::vector<Piece*>> board) {
+std::vector<Vector2> Empty::GetValidMoves(std::vector<std::vector<Piece*>> board, bool discovered_check) {
 	std::vector<Vector2> moves;
 	return moves;
 }

@@ -7,7 +7,7 @@ King::King(int x, int y, int side) : Piece(x, y, side) {
 	this->g_piece = KING | side;
 }
 
-std::vector<Vector2> King::GetValidMoves(std::vector<std::vector<Piece*>> board) {
+std::vector<Vector2> King::GetValidMoves(std::vector<std::vector<Piece*>> board, bool discovered_check) {
 	// TODO: Store moves in one array and only update it every move
 	std::vector<Vector2> moves;
 	std::vector<Vector2> compressed;
@@ -22,17 +22,15 @@ std::vector<Vector2> King::GetValidMoves(std::vector<std::vector<Piece*>> board)
 			}
 			// To lazy to implement a proper method that won't iterate through 400+ moves 64 times.
 			// Man this is going to take some time
-			// for (int i = 0; i < 8; i++) {
-			// 	for (int j = 0; j < 8; j++) {
-			// 		for (auto move : this->moves[i][j]) {
-			// 			if (move.x == x && move.y == y && board[i][j]->g_side != this->g_side) {
-			// 				illegal_move = true;
-			// 				break;
-			// 			}
-			// 		}
-			// 	}
-			// }
-			for (auto move : compressed) {
+			for (int i = 0; i < 8; i++) {
+				for (int j = 0; j < 8; j++) {
+					for (auto move : this->moves[i][j]) {
+						if (move.x == x && move.y == y && board[i][j]->g_side != this->g_side) {
+							illegal_move = true;
+							break;
+						}
+					}
+				}
 			}
 			if (illegal_move) {
 				std::cout << "IOLEGLAL " << x << " " << y << std::endl;

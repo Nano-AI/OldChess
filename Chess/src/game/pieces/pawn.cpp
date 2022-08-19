@@ -9,7 +9,7 @@ Pawn::Pawn(int x, int y, int side, int direction) : Piece(x, y, side) {
 	this->direction = direction;
 }
 
-std::vector<Vector2> Pawn::GetValidMoves(std::vector<std::vector<Piece*>> board) {
+std::vector<Vector2> Pawn::GetValidMoves(std::vector<std::vector<Piece*>> board, bool discovered_check) {
 	std::vector<Vector2> moves;
 	int x = this->g_coord.x;
 	int y = this->g_coord.y;

@@ -30,8 +30,8 @@ Vector2 Piece::GetCoord() {
 	return this->g_coord;
 }
 
-bool Piece::Move(int x, int y, std::vector<std::vector<Piece*>> board) {
-	std::vector<Vector2> valid_moves = GetValidMoves(board);
+bool Piece::Move(int x, int y, std::vector<std::vector<Piece*>> board, bool discovered_check) {
+	std::vector<Vector2> valid_moves = GetValidMoves(board, discovered_check);
 	for (Vector2 move : valid_moves) {
 		if (move.x == x && move.y == y) {
 			return true;

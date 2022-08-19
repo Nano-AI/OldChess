@@ -28,9 +28,9 @@ public:
 	int Y();
 	Vector2 GetCoord();
 	//virtual bool Move(int x, int y) = 0;
-	bool Move(int x, int y, std::vector<std::vector<Piece*>> board);
+	bool Move(int x, int y, std::vector<std::vector<Piece*>> board, bool discovered_check = false);
 	virtual Piece* Clone() = 0;
-	virtual std::vector<Vector2> GetValidMoves(std::vector<std::vector<Piece*>> board) = 0;
-	//virtual std::vector<Vector2> GetValidMoves(std::vector<std::vector<Piece*>> board) = 0;
+	virtual std::vector<Vector2> GetValidMoves(std::vector<std::vector<Piece*>> board, bool discovered_check = false) = 0;
+	//virtual std::vector<Vector2> GetValidMoves(std::vector<std::vector<Piece*>> board, bool discovered_check = false) = 0;
 };
 
