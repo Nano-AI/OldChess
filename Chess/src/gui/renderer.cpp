@@ -9,6 +9,7 @@ static int light_square_rgb[3] = { 243, 242, 242 };
 static int dark_square_rgb[3] = { 125, 135, 150 };
 static int background_rgb[3] = { 100, 100, 100 };
 static int move_color[4] = { 180, 200, 155, 200 };
+static int check_color[4] = { 255, 0, 0, 100 };
 
 const char* c_white_dir = "./resources/pieces/white";
 const char* c_black_dir = "./resources/pieces/black";
@@ -36,13 +37,12 @@ Renderer::Renderer(Window* win, Board* board) : win(this->win), board(this->boar
 	this->board = board;
 	// If it should be drawed from white's point of view.
 	SDL_SetEventFilter(FilterEvent, this);
-	Image image;
-	image.win = this->win;
-	image.LoadPieces(c_white_dir, c_black_dir);
+	Image* image = new Image(win);
+	image->LoadPieces(c_white_dir, c_black_dir);
 	this->images = image;
 
 	// Get sizes of images
-	for (auto& [piece, texture] : this->images.g_pieces_images) {
+	for (auto& [piece, texture] : this->images->g_pieces_images) {
 		int x = 0;
 		int y = 0;
 		int p = piece;
@@ -64,7 +64,7 @@ Renderer::Renderer(Window* win, Board* board) : win(this->win), board(this->boar
 	this->moves = std::vector<std::vector<std::vector<Vector2>>>(
 		8,
 		std::vector<std::vector<Vector2>>(8)
-	);
+		);
 
 	// Setup the empty spaces
 	for (int x = 0; x < 8; x++) {
@@ -90,6 +90,7 @@ void Renderer::Render(bool filter_event) {
 	SDL_RenderClear(this->win->g_renderer);
 	DrawBoard();
 	DrawMoves();
+	DrawCheck();
 	DrawPieces();
 	SDL_SetRenderDrawColor(this->win->g_renderer, background_rgb[0], background_rgb[1], background_rgb[2], 255);
 	//DrawPossibleMoves(this->pov_white);
@@ -97,7 +98,6 @@ void Renderer::Render(bool filter_event) {
 }
 
 void Renderer::DrawBoard() {
-	//LOG_F(ERROR, "RAAHHHHHH");
 	// Get the renderer and clear it
 	SDL_Renderer* render = win->g_renderer;
 	auto values = CalculateDetails(this->win);
@@ -126,7 +126,7 @@ void Renderer::DrawBoard() {
 
 void Renderer::DrawPieces() {
 	auto board = this->board->GetBoard();
-	auto loaded_pieces = this->images.g_pieces_images;
+	auto loaded_pieces = this->images->g_pieces_images;
 	auto render = this->win->g_renderer;
 
 	auto values = CalculateDetails(this->win);
@@ -201,17 +201,13 @@ void Renderer::DrawPiece(Piece* piece, SDL_Texture* piece_texture, Vector2 image
 }
 
 void Renderer::UpdateMoves() {
-	King* white = NULL;
-	King* black = NULL;
+	King* white = this->board->white_king;
+	King* black = this->board->black_king;
+	white->g_in_check = false;
+	black->g_in_check = false;
 	for (int x = 0; x < 8; x++) {
 		for (int y = 0; y < 8; y++) {
 			if (this->board->At(x, y)->g_is_king) {
-				if (this->board->At(x, y)->g_side == WHITE) {
-					white = (King*) this->board->At(x, y);
-				}
-				else {
-					black = (King*) this->board->At(x, y);
-				}
 				continue;
 			}
 			Piece* current = this->board->g_game_board[x][y];
@@ -222,12 +218,43 @@ void Renderer::UpdateMoves() {
 		LOG_F(ERROR, "White and/or black king's is/are missing!");
 		return;
 	}
-	white->moves = this->moves;
-	black->moves = this->moves;
 	this->board->At(white->X(), white->Y())->GenerateMoves(this->board->g_game_board);
 	this->board->At(black->X(), black->Y())->GenerateMoves(this->board->g_game_board);
-//	this->moves[white->X()][white->Y()] = white->GetValidMoves(this->board->g_game_board);
-//	this->moves[black->X()][black->Y()] = black->GetValidMoves(this->board->g_game_board);
+}
+
+void Renderer::DrawCheck() {
+	King* check = NULL;
+
+	// Only one king can be in check at a time
+	if (this->board->white_king->g_in_check) {
+		check = this->board->white_king;
+	}
+	else if (this->board->black_king->g_in_check) {
+		check = this->board->black_king;
+	}
+	else {
+		return;
+	}
+
+	RenderMathValues values = CalculateDetails(this->win);
+
+	int size = values.size;
+	int x_offset = values.x_offset;
+	int y_offset = values.y_offset;
+
+	SDL_Renderer* render = this->win->g_renderer;
+	SDL_Surface* surface = this->win->g_surface;
+
+	SDL_Rect rect;
+	rect.x = (check->Y() * (size + 1) + x_offset);
+	rect.y = (check->X() * (size + 1) + y_offset);
+	rect.w = size + 1;
+	rect.h = size + 1;
+	SDL_SetRenderDrawBlendMode(render, SDL_BLENDMODE_BLEND);
+	SDL_SetRenderDrawColor(render, check_color[0], check_color[1], check_color[2], check_color[3]);
+	SDL_RenderFillRect(render, &rect);
+	SDL_RenderDrawRect(render, &rect);
+	SDL_SetRenderDrawBlendMode(render, SDL_BLENDMODE_NONE);
 }
 
 void Renderer::DrawMoves() {
@@ -327,14 +354,7 @@ void Renderer::MouseUp(SDL_Event* event) {
 			break;
 		}
 		for (int y = 0; y < 8; y++) {
-			/* Make sure that the piece isn't the same as the selected piece that the piece was in */
-			//if (CoordEqual(&this->selected_piece->g_coord, &this->board->g_game_board[x][y]->g_coord) ||
-			//    /* Check for empty boxes as well */
-			//    CoordEqual(&this->selected_piece->g_coord, &this->empty_spots[x][y]->g_coord)) {
-			//    continue;
-			//}
 			if (/* Check if player dropped it on a piece */
-				//SDL_PointInRect(&this->mouse_pos, &this->board->g_game_board[x][y]->g_box) ||
 				/* Check if player dropped it on an empty box */
 				SDL_PointInRect(&this->mouse_pos, &this->empty_spots[x][y]->g_box)) {
 				dropped_box = this->empty_spots[y][x];
@@ -349,16 +369,24 @@ void Renderer::MouseUp(SDL_Event* event) {
 	Vector2 end = dropped_box->g_coord;
 	Piece* dropped = this->board->At(end.x, end.y);
 	bool capture = (dropped->g_piece != EMPTY);
-	// Honestly, I'm not sure why this is the way it is, but it works and I'm too lazy to make a proper implementation
+	Piece* white = this->board->white_king;
+	Piece* black = this->board->black_king;
+	
 	int msg = this->board->Move(start.x, start.y, end.x, end.y);
+	
 	if (msg == SUCCESS) {
 		if (capture) {
-			this->sound->PlaySound("capture");
+			this->sound->PlaySound(SOUND_CAPTURE);
 		}
 		else {
-			this->sound->PlaySound("move");
+			this->sound->PlaySound(SOUND_MOVE);
 		}
+		
 		UpdateMoves();
+		
+		if (this->board->black_king->g_in_check || this->board->white_king->g_in_check) {
+			this->sound->PlaySound(SOUND_CHECK);
+		}
 	}
 }
 

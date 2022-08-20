@@ -1,6 +1,6 @@
 #include "board.h"
 
-Piece* GetPiece(char value, int x, int y, int playing_side) {
+Piece* Board::GetPiece(char value, int x, int y, int playing_side) {
 	int side = isupper(value) ? WHITE : BLACK;
 	int direction = (side == playing_side) ? -1 : 1;
 	switch (tolower(value)) {
@@ -14,17 +14,23 @@ Piece* GetPiece(char value, int x, int y, int playing_side) {
 		return new Rook(x, y, side);
 	case 'q':
 		return new Queen(x, y, side);
-	case 'k':
-		return new King(x, y, side);
-	default:
-		LOG_F(ERROR, "Unkown piece %s", value);
+	case 'k': {
+		King* k = new King(x, y, side);
+		if (side == WHITE) {
+			this->white_king = k;
+		}
+		else {
+			this->black_king = k;
+		}
+		return k;
 	}
-	return NULL;
+	default:
+		LOG_F(ERROR, "Unkown piece %d", value);
+		return NULL;
+	}
 }
 
 Board::Board(int side) {
-	this->white_king = new King(0, 0, WHITE);
-	this->black_king = new King(0, 0, WHITE);
 	// Use the board.fen in resources some day
 	// Create a vector with 8 rows and 8 columns, with the default value BLANK.
 	this->g_game_board = std::vector<std::vector<Piece*>>(
@@ -121,6 +127,7 @@ Piece* Board::At(int x, int y) {
 }
 
 int Board::Move(int startX, int startY, int toX, int toY) {
+	LOG_F(INFO, "Moving piece from (%i, %i) to (%i, %i).", startX, startY, toX, toY);
 	Piece* start = At(startX, startY);
 	Piece* end = At(toX, toY);
 
@@ -143,6 +150,17 @@ int Board::Move(int startX, int startY, int toX, int toY) {
 		g_game_board[startX][startY]->g_first_move = false;
 	}
 
+	bool is_white_king = false, is_black_king = false;
+
+	if (this->g_game_board[startX][startY]->g_is_king) {
+		if (this->g_game_board[startX][startY]->IsWhite()) {
+			is_white_king = true;
+		}
+		else {
+			is_black_king = true;
+		}
+	}
+
 	// Clear out memory
 	delete(this->g_game_board[toX][toY]);
 	this->g_game_board[toX][toY] = start->Clone();
@@ -150,5 +168,11 @@ int Board::Move(int startX, int startY, int toX, int toY) {
 	delete(this->g_game_board[startX][startY]);
 	this->g_game_board[startX][startY] = new Empty(startX, startY, EMPTY);
 	
+	if (is_white_king) {
+		this->white_king = (King*) this->g_game_board[toX][toY];
+	} if (is_black_king) {
+		this->black_king = (King*) this->g_game_board[toX][toY];
+	}
+
 	return SUCCESS;
 }

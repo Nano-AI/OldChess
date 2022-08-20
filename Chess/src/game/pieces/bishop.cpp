@@ -23,7 +23,8 @@ std::vector<Vector2> Bishop::GetValidMoves(std::vector<std::vector<Piece*>> boar
 				if (board[new_x][new_y]->g_side == this->g_side && board[new_x][new_y]->g_piece != BLANK) {
 					break;
 				}
-				if (board[new_x][new_y]->g_is_king) {
+				// TODO: Check if it's the same side or not
+				if (board[new_x][new_y]->g_is_king && board[new_x][new_y]->g_side != this->g_side) {
 					((King*)board[new_x][new_y])->g_in_check = true;
 					break;
 				}

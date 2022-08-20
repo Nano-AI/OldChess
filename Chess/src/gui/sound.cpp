@@ -25,7 +25,7 @@ Sound::~Sound() {
 }
 
 void Sound::PlaySound(std::string event) {
-	LOG_F(INFO, "Playing sound %s.", this->sounds.find(event)->first);
+	LOG_F(INFO, "Playing sound %s.", this->sounds.find(event)->first.c_str());
 	Mix_PlayMusic(this->sounds.find(event)->second, 1);
 }
 

@@ -32,13 +32,14 @@ public:
 	void Update();
 	void DrawBoard();
 	void DrawPieces();
-	void DrawMoves() ;
+	void DrawMoves();
+	void DrawCheck();
 	void DrawPiece(Piece* piece, SDL_Texture* piece_texture, Vector2 image_size, RenderMathValues values);
 	int HandleInput(SDL_Event* event);
 private:
 	bool mouse_down;
 	Sound* sound;
-	Image images;
+	Image* images;
 	Window* win;
 	Board* board;
 	SDL_Point mouse_pos;

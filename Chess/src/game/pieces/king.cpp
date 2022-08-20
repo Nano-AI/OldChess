@@ -25,7 +25,7 @@ std::vector<Vector2> King::GetValidMoves(std::vector<std::vector<Piece*>> board)
 			// Man this is going to take some time
 			for (int i = 0; i < 8; i++) {
 				for (int j = 0; j < 8; j++) {
-					for (auto move : this->moves[i][j]) {
+					for (auto move : board[i][j]->g_moves) {
 						if (move.x == x && move.y == y && board[i][j]->g_side != this->g_side) {
 							illegal_move = true;
 							break;
@@ -34,7 +34,6 @@ std::vector<Vector2> King::GetValidMoves(std::vector<std::vector<Piece*>> board)
 				}
 			}
 			if (illegal_move) {
-				std::cout << "IOLEGLAL " << x << " " << y << std::endl;
 				continue;
 			}
 			Piece* current = board[x][y];
@@ -44,12 +43,10 @@ std::vector<Vector2> King::GetValidMoves(std::vector<std::vector<Piece*>> board)
 			if (current->g_is_king) {
 				break;
 			}
-			std::cout << "is ok! " << x << " " << y << std::endl;
 			moves.push_back(current->GetCoord());
 		}
 	}
 	return moves;
-
 }
 
 Piece* King::Clone() {

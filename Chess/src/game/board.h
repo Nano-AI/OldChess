@@ -26,6 +26,7 @@ public:
 	King* white_king, * black_king;
 	Board(int side);
 	void LoadFEN(int side);
+	Piece* GetPiece(char value, int x, int y, int playing_side);
 	void PrintBoard();
 	int Move(int startX, int startY, int toX, int toY);
 	/*int Move(Vector2 start, Vector2 end);

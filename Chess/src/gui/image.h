@@ -17,7 +17,7 @@ public:
 	Window* win;
 	std::map<int, SDL_Texture*> g_pieces_images;
 	//Image(Window* window);
-	Image();
+	Image(Window* win);
 	static SDL_Texture* LoadImage(SDL_Renderer* renderer, const char* file);
 	std::map<int, SDL_Texture*> LoadDirectory(const char* directory, int side = WHITE);
 	void LoadPieces(const char* white_dir, const char* black_dir);

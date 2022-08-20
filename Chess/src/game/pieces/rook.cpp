@@ -18,7 +18,7 @@ std::vector<Vector2> Rook::GetValidMoves(std::vector<std::vector<Piece*>> board)
 			if (current->g_side == this->g_side && current->g_piece != EMPTY) {
 				break;
 			}
-			if (current->g_is_king) {
+			if (current->g_is_king && current->g_side != this->g_side) {
 				((King*)current)->g_in_check = true;
 				break;
 			}

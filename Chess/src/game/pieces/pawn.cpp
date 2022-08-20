@@ -33,7 +33,7 @@ std::vector<Vector2> Pawn::GetValidMoves(std::vector<std::vector<Piece*>> board)
 					LOG_F(ERROR, "Current was null.");
 					continue;
 				}
-				if (current->g_is_king) {
+				if (current->g_is_king && current->g_side != current->g_side) {
 					((King*)current)->g_in_check = true;
 					continue;
 				}

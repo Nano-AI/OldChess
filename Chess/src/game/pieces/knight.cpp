@@ -17,7 +17,7 @@ std::vector<Vector2> Knight::GetValidMoves(std::vector<std::vector<Piece*>> boar
 			int x2 = x + j, y2 = y + i;
 			if (x1 >= 0 && x1 <=7 && y1 >= 0 && y1 <=7) {
 				Piece* current1 = board[x1][y1];
-				if (current1->g_is_king) {
+				if (current1->g_is_king && current1->g_side != this->g_side) {
 					((King*)current1)->g_in_check = true;
 					continue;
 				}
@@ -27,7 +27,7 @@ std::vector<Vector2> Knight::GetValidMoves(std::vector<std::vector<Piece*>> boar
 			}
 			if (x2 >= 0 && x2 <=7 && y2 >= 0 && y2 <=7) {
 				Piece* current2 = board[x2][y2];
-				if (current2->g_is_king) {
+				if (current2->g_is_king && current2->g_side != this->g_side) {
 					((King*)current2)->g_in_check = true;
 					continue;
 				}

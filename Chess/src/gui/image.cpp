@@ -1,6 +1,8 @@
 #include "image.h"
 
-Image::Image() { }
+Image::Image(Window* win) {
+    this->win = win;
+}
 
 void Image::LoadPieces(const char* white_dir, const char* black_dir) {
     // Create basic vector with all the peices
@@ -12,8 +14,8 @@ void Image::LoadPieces(const char* white_dir, const char* black_dir) {
     // Set global pieces to all the pieces
     this->g_pieces_images = loaded_white_dir;
     /*for (auto it = loaded_white_dir.begin(); it != loaded_white_dir.end(); ++it) {
-        std::cout << "Key: " << it->first << "\t";
-        std::cout << "Value: " << it->second << std::endl;
+        
+        
     }*/
 }
 
@@ -31,7 +33,7 @@ std::map<int, SDL_Texture*> Image::LoadDirectory(const char* directory, int side
         loaded_images.insert(
             std::pair<int, SDL_Texture*> (
                 // Gets the side and does 'or' operator on the side
-                Pieces::c_name_binary.at(filename) | side, LoadImage(win->g_renderer, path.c_str())
+                Pieces::c_name_binary.at(filename) | side, LoadImage(this->win->g_renderer, path.c_str())
             )
         );
         // Delete the piece from the vector 
@@ -46,7 +48,7 @@ std::map<int, SDL_Texture*> Image::LoadDirectory(const char* directory, int side
         }
         missing_files += "}";
         LOG_F(ERROR, "Missing files %s in %s", missing_files.c_str(), directory);
-        win->Quit(-1);
+        this->win->Quit(-1);
     }
     LOG_F(INFO, "Done loading %s", directory);
     return loaded_images;

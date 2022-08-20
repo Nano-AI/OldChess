@@ -6,6 +6,13 @@
 #include <SDL2/SDL_mixer.h>
 #include <loguru.hpp>
 
+#define SOUND_MOVE      "move"
+#define SOUND_CAPTURE   "capture"
+#define SOUND_CASTLE    "castle"
+#define SOUND_CHECK     "check"
+#define SOUND_CHECKMATE "checkmate"
+#define SOUND_STALEMATE "stalemate"
+
 class Sound
 {
 public:
