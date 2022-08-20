@@ -2,6 +2,11 @@
 
 Chess made in C++ using SDL2.
 
+### Ideas
+- Maybe add SVG support
+- Add PGN Support
+- See moves played in game
+
 ## Description
 
 This is a small Chess project where you can play Chess against yourself. It's made using SDL2, SDL_image, SDL_mixer, and Loguru.

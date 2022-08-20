@@ -1,6 +1,6 @@
 {
 	"board": {
-		"fen": "8/5k2/3p4/1p1Pp2p/pP2Pp1P/P4P1K/8/8 b - - 99 50",
-		"side":  "black"
+		"fen": "3qr1k1/r3bp1p/p1n1pnp1/1p1b2B1/7Q/1BN2N2/PP3PPP/3RR1K1 w - - 6 19",
+		"side":  "white"
 	}
 }
