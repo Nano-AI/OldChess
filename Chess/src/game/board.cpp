@@ -47,7 +47,7 @@ Piece* Board::GetPiece(char value, int x, int y, int playing_side) {
 	}
 }
 
-Board::Board(int side) {
+Board::Board(json settings) {
 	// Use the board.fen in resources some day
 	// Create a vector with 8 rows and 8 columns, with the default value BLANK.
 	this->g_game_board = std::vector<std::vector<Piece*>>(
@@ -58,7 +58,18 @@ Board::Board(int side) {
 		8,
 		std::vector<int>(8)
 	);
-	LoadFEN(side);
+
+	this->settings = settings;
+
+	std::string s = this->settings["board"]["side"];
+	if (s != "black" && s != "white") {
+		LOG_F(ERROR, "Unknown side %s.", s.c_str());
+		s = "white";
+	}
+
+	this->side = (s == "white") ? WHITE : BLACK;
+
+	LoadFEN();
 
 	int playing = side;
 	int other = (playing == WHITE) ? BLACK : WHITE;
@@ -70,11 +81,13 @@ Board::Board(int side) {
 	}
 }
 
-void Board::LoadFEN(int side) {
+void Board::LoadFEN() {
 	int playing = side;
 	int other = (playing == WHITE) ? BLACK : WHITE;
 	LOG_F(INFO, "Loading board using FEN...");
-	std::string fen = File::ReadFile("./resources/board.fen");
+
+	std::string fen = this->settings["board"]["fen"];
+
 	if (std::regex_match(fen, std::regex(this->validate_fen_regex))) {
 		LOG_F(INFO, "Valid FEN: %s", fen.c_str());
 	}
@@ -83,7 +96,7 @@ void Board::LoadFEN(int side) {
 		fen = this->default_fen;
 	}
 	int start, end, direction;
-	if (side == WHITE) {
+	if (this->side == WHITE) {
 		start = 0;
 		end = 7;
 		direction = 1;
@@ -118,14 +131,14 @@ void Board::LoadFEN(int side) {
 			continue;
 		}
 		else {
-			this->g_game_board[x][y] = GetPiece(piece, x, y, side);
+			this->g_game_board[x][y] = GetPiece(piece, x, y, this->side);
 			this->g_game_board[x][y]->g_coord = { x, y };
 		}
 		y++;
 	}
 	
 	if (sfen[1] != "w" && sfen[1] != "b") {
-		LOG_F(ERROR, "Unknown side %c.", sfen[1]);
+		LOG_F(ERROR, "Unknown this->side %c.", sfen[1]);
 		sfen = split(this->default_fen, ' ');
 	}
 
@@ -138,8 +151,8 @@ void Board::LoadFEN(int side) {
 	this->white_castle = { false, false };
 	this->black_castle = { false, false };
 
-	for (char side : sfen[2]) {
-		switch (side) {
+	for (char s : sfen[2]) {
+		switch (s) {
 		case 'K':
 			this->white_castle.king_side = true;
 			break;
@@ -151,8 +164,11 @@ void Board::LoadFEN(int side) {
 			break;
 		case 'q':
 			this->black_castle.queen_side = true;
+			break;
+		case '-':
+			break;
 		default:
-			LOG_F(ERROR, "Unknown side for castle: %c.", side);
+			LOG_F(ERROR, "Unknown side for castle: %c.", s);
 		}
 	}
 	// Other values are not needed for now

@@ -1,6 +1,7 @@
 #include <SDL2/SDL.h>
 #include <iostream>
 #include <loguru.hpp>
+#include <fstream>
 #include "./gui/window.h"
 #include "./game/board.h"
 #include "./gui/renderer.h"
@@ -12,12 +13,15 @@ int main(int argc, char* argv[]) {
 	loguru::init(argc, argv);
 	loguru::add_file("Chess.log", loguru::Append, loguru::Verbosity_MAX);
 
+	std::ifstream f("settings.json");
+	json data = json::parse(f);
+
 	// Play as white or black
-	Board board(BLACK);
+	Board board(data);
 	Window win(800, 800, "Chess");
 	Renderer render(&win, &board);
 	SDL_Event event;
-
+	
 	bool done = false;
 
 	while ((!done) && (SDL_WaitEvent(&event))) {

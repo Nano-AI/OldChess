@@ -9,6 +9,8 @@
 #include <sstream>
 #include <vector>
 #include <iterator>
+#include <fstream>
+#include <json.hpp>
 #include "./pieces.h"
 #include "./piece.h"
 #include "./pieces/empty.h"
@@ -20,6 +22,8 @@
 #include "./pieces/king.h"
 #include "./errors.h"
 #include "./file.h"
+
+using json = nlohmann::json;
 
 struct Castle {
 	bool queen_side;
@@ -36,10 +40,10 @@ public:
 	std::vector<std::vector<Piece*>> g_game_board;
 	std::vector<std::vector<int>> g_board_colors;
 	King* white_king, * black_king;
-	Board(int side);
+	Board(json settings);
 	bool IsTurn(int side);
 	int OppositeSide(int side);
-	void LoadFEN(int side);
+	void LoadFEN();
 	Piece* GetPiece(char value, int x, int y, int playing_side);
 	void PrintBoard();
 	int Move(int startX, int startY, int toX, int toY);
@@ -53,4 +57,6 @@ protected:
 		")|(-))\\s\\d+\\s\\d+"
 		"\\s*");
 	const std::string default_fen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
+	json settings;
+	int side;
 };

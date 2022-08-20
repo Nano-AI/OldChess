@@ -156,6 +156,6 @@
     </Image>
   </ItemGroup>
   <ItemGroup>
-    <None Include="resources\board.fen" />
+    <None Include="settings.json" />
   </ItemGroup>
 </Project>
