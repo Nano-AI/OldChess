@@ -323,6 +323,10 @@ int Renderer::HandleInput(SDL_Event* event) {
 						break;
 					Piece* piece = this->board->g_game_board[x][y];
 					if (SDL_PointInRect(&this->mouse_pos, &piece->g_box)) {
+						if (!this->board->IsTurn(piece->g_side)) {
+							LOG_F(ERROR, "Not your turn.");
+							return -1;
+						}
 						this->selected_piece = piece;
 						break;
 					}

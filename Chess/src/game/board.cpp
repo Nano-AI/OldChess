@@ -1,5 +1,22 @@
 #include "board.h"
 
+// I have no clue what this guy from stack overflow did
+// https://stackoverflow.com/questions/236129/how-do-i-iterate-over-the-words-of-a-string
+template <typename Out>
+void split(const std::string &s, char delim, Out result) {
+    std::istringstream iss(s);
+    std::string item;
+    while (std::getline(iss, item, delim)) {
+        *result++ = item;
+    }
+}
+
+std::vector<std::string> split(const std::string &s, char delim) {
+    std::vector<std::string> elems;
+    split(s, delim, std::back_inserter(elems));
+    return elems;
+}
+
 Piece* Board::GetPiece(char value, int x, int y, int playing_side) {
 	int side = isupper(value) ? WHITE : BLACK;
 	int direction = (side == playing_side) ? -1 : 1;
@@ -77,7 +94,10 @@ void Board::LoadFEN(int side) {
 		direction = -1;
 	}
 	int x = start, y = 0;
-	for (char piece : fen) {
+
+	std::vector<std::string> sfen = split(fen, ' ');
+
+	for (char piece : sfen[0]) {
 		// If reached end of FEN
 		if (piece == ' ') {// || (y == 8 && (x == 0 || x == 7))) {
 			break;
@@ -103,6 +123,39 @@ void Board::LoadFEN(int side) {
 		}
 		y++;
 	}
+	
+	if (sfen[1] != "w" && sfen[1] != "b") {
+		LOG_F(ERROR, "Unknown side %c.", sfen[1]);
+		sfen = split(this->default_fen, ' ');
+	}
+
+	if (sfen[1] == "w") {
+		this->g_active_color = WHITE;
+	} else if (sfen[1] == "b") {
+		this->g_active_color = BLACK;
+	}
+
+	this->white_castle = { false, false };
+	this->black_castle = { false, false };
+
+	for (char side : sfen[2]) {
+		switch (side) {
+		case 'K':
+			this->white_castle.king_side = true;
+			break;
+		case 'k':
+			this->black_castle.king_side = true;
+			break;
+		case 'Q':
+			this->white_castle.queen_side = true;
+			break;
+		case 'q':
+			this->black_castle.queen_side = true;
+		default:
+			LOG_F(ERROR, "Unknown side for castle: %c.", side);
+		}
+	}
+	// Other values are not needed for now
 }
 
 void Board::PrintBoard() {
@@ -126,7 +179,19 @@ Piece* Board::At(int x, int y) {
 	return this->g_game_board[x][y];
 }
 
+int Board::OppositeSide(int side) {
+	return (side == WHITE) ? BLACK : WHITE;
+}
+
+bool Board::IsTurn(int side) {
+	return side == this->g_active_color;
+}
+
 int Board::Move(int startX, int startY, int toX, int toY) {
+	if (At(startX, startY)->g_side != this->g_active_color) {
+		LOG_F(ERROR, "Not your turn.");
+		return DIFFERENT_SIDE_TURN;
+	}
 	LOG_F(INFO, "Moving piece from (%i, %i) to (%i, %i).", startX, startY, toX, toY);
 	Piece* start = At(startX, startY);
 	Piece* end = At(toX, toY);
@@ -145,10 +210,7 @@ int Board::Move(int startX, int startY, int toX, int toY) {
 	}
 
 	// Because we don't discriminate in the game of chess!
-	if (this->g_game_board[startX][startY]->g_piece == WPAWN || 
-		this->g_game_board[startX][startY]->g_piece == BPAWN) {
-		g_game_board[startX][startY]->g_first_move = false;
-	}
+	g_game_board[startX][startY]->g_first_move = false;
 
 	bool is_white_king = false, is_black_king = false;
 
@@ -173,6 +235,8 @@ int Board::Move(int startX, int startY, int toX, int toY) {
 	} if (is_black_king) {
 		this->black_king = (King*) this->g_game_board[toX][toY];
 	}
+
+	this->g_active_color = OppositeSide(this->g_active_color);
 
 	return SUCCESS;
 }
