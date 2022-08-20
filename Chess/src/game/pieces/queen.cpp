@@ -7,7 +7,7 @@ Queen::Queen(int x, int y, int side) : Piece(x, y, side) {
 	this->g_piece = QUEEN | side;
 }
 
-std::vector<Vector2> Queen::GetValidMoves(std::vector<std::vector<Piece*>> board, bool discovered_check) {
+std::vector<Vector2> Queen::GetValidMoves(std::vector<std::vector<Piece*>> board) {
 	std::vector<Vector2> moves = {};
 	int x = this->X(), y = this->Y();
 	Bishop* b = new Bishop(x, y, this->g_side);
@@ -24,18 +24,6 @@ std::vector<Vector2> Queen::GetValidMoves(std::vector<std::vector<Piece*>> board
 	// No clue what's happening.std::vector<Vector2> discovered_moves;
 	delete(b);
 	delete(r);
-	if (!discovered_check) {
-		std::cout << "RUNNING\n" << std::endl;
-		std::vector<Vector2> discovered_moves = std::vector<Vector2>(0);
-		for (auto move : moves) {
-			Piece* k = Clone();
-			if (k->Move(move.x, move.y, board, true)) {
-				discovered_moves.push_back(move);
-			}
-			delete(k);
-		}
-		return discovered_moves;
-	}
 	return moves;
 }
 

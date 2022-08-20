@@ -14,7 +14,7 @@ Sound::Sound() {
 	for (auto const& [event, filename] : this->c_sound_name) {
 		Mix_Music* music = Mix_LoadMUS((this->sound_dir + filename).c_str());
 		sounds.insert(std::pair(event, music));
-		LOG_F(INFO, "Loaded event \"%s\" from file \"%s\".", event, filename);
+		LOG_F(INFO, "Loaded event \"%s\" from file \"%s\".", event.c_str(), filename.c_str());
 	}
 }
 

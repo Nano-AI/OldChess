@@ -215,7 +215,7 @@ void Renderer::UpdateMoves() {
 				continue;
 			}
 			Piece* current = this->board->g_game_board[x][y];
-			this->moves[x][y] = this->board->At(x, y)->GetValidMoves(this->board->g_game_board);
+			this->board->At(x, y)->GenerateMoves(this->board->g_game_board);
 		}
 	}
 	if (!white || !black) {
@@ -224,16 +224,10 @@ void Renderer::UpdateMoves() {
 	}
 	white->moves = this->moves;
 	black->moves = this->moves;
-	this->moves[white->X()][white->Y()] = white->GetValidMoves(this->board->g_game_board);
-	this->moves[black->X()][black->Y()] = black->GetValidMoves(this->board->g_game_board);
-}
-
-void Renderer::ClearMoves() {
-	for (int x = 0; x < 8; x++) {
-		for (int y = 0; y < 8; y++) {
-			this->moves[x][y].clear();
-		}
-	}
+	this->board->At(white->X(), white->Y())->GenerateMoves(this->board->g_game_board);
+	this->board->At(black->X(), black->Y())->GenerateMoves(this->board->g_game_board);
+//	this->moves[white->X()][white->Y()] = white->GetValidMoves(this->board->g_game_board);
+//	this->moves[black->X()][black->Y()] = black->GetValidMoves(this->board->g_game_board);
 }
 
 void Renderer::DrawMoves() {
@@ -252,7 +246,7 @@ void Renderer::DrawMoves() {
 
 	int circle_size = size / 8;
 
-	for (Vector2 move : this->moves[sx][sy]) {
+	for (Vector2 move : this->board->At(sx, sy)->g_moves) {
 		int x = move.x;
 		int y = move.y;
 		if (x >= 8 || x < 0 || y >= 8 || y < 0) {
@@ -364,11 +358,9 @@ void Renderer::MouseUp(SDL_Event* event) {
 		else {
 			this->sound->PlaySound("move");
 		}
-		ClearMoves();
 		UpdateMoves();
 	}
 }
-
 
 int FilterEvent(void* userdata, SDL_Event* event) {
 	if (event->type == SDL_WINDOWEVENT && event->window.event == SDL_WINDOWEVENT_RESIZED) {

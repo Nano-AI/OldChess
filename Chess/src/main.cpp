@@ -20,8 +20,6 @@ int main(int argc, char* argv[]) {
 
 	bool done = false;
 
-	//board.PrintBoard();	
-
 	while ((!done) && (SDL_WaitEvent(&event))) {
 		//render.Update();
 		render.HandleInput(&event);

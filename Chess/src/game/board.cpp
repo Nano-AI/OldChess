@@ -1,24 +1,31 @@
 #include "board.h"
 
-Piece* GetPiece(int value, int x, int y, int side) {
-	switch (value) {
-	case BISHOP:
+Piece* GetPiece(char value, int x, int y, int playing_side) {
+	int side = isupper(value) ? WHITE : BLACK;
+	int direction = (side == playing_side) ? -1 : 1;
+	switch (tolower(value)) {
+	case 'p':
+		return new Pawn(x, y, side, direction);
+	case 'b':
 		return new Bishop(x, y, side);
-	case KNIGHT:
+	case 'n':
 		return new Knight(x, y, side);
-	case ROOK:
+	case 'r':
 		return new Rook(x, y, side);
-	case QUEEN:
+	case 'q':
 		return new Queen(x, y, side);
-	case KING:
+	case 'k':
 		return new King(x, y, side);
 	default:
-		LOG_F(ERROR, "Unkown piece |0x%0.4x|", value);
+		LOG_F(ERROR, "Unkown piece %s", value);
 	}
 	return NULL;
 }
 
 Board::Board(int side) {
+	this->white_king = new King(0, 0, WHITE);
+	this->black_king = new King(0, 0, WHITE);
+	// Use the board.fen in resources some day
 	// Create a vector with 8 rows and 8 columns, with the default value BLANK.
 	this->g_game_board = std::vector<std::vector<Piece*>>(
 		8,
@@ -28,36 +35,68 @@ Board::Board(int side) {
 		8,
 		std::vector<int>(8)
 	);
-	int backrank[8] = {ROOK, KNIGHT, BISHOP, QUEEN, KING, BISHOP, KNIGHT, ROOK};
+	LoadFEN(side);
 
 	int playing = side;
 	int other = (playing == WHITE) ? BLACK : WHITE;
-
-	for (int i = 0; i < 8; i++) {
-		// Piece is going up towards the top
-		this->g_game_board[1][i] = new Pawn(1, i, playing, 1);
-		// Piece is going down towards the bottom
-		this->g_game_board[6][i] = new Pawn(6, i, other, -1);
-		this->g_game_board[7][i] = GetPiece(backrank[i], 7, i, other);
-		this->g_game_board[0][i] = GetPiece(backrank[i], 0, i, playing);
-	}
-	for (int x = 2; x < 6; x++) {
-		for (int y = 0; y < 8; y++) {
-			this->g_game_board[x][y] = new Empty(x, y, EMPTY);
-		}
-	}
-	for (int x = 0; x < 8; x++) {
-		for (int y = 0; y < 8; y++) {
-			this->g_game_board[x][y]->g_coord = { x, y };
-		}
-	}
 
 	for (int x = 0; x < 8; x++) {
 		for (int y = 0; y < 8; y++) {
 			this->g_board_colors[x][y] = ((x + y) % 2 == 0) ? other : playing;
 		}
 	}
+}
 
+void Board::LoadFEN(int side) {
+	int playing = side;
+	int other = (playing == WHITE) ? BLACK : WHITE;
+	LOG_F(INFO, "Loading board using FEN...");
+	std::string fen = File::ReadFile("./resources/board.fen");
+	if (std::regex_match(fen, std::regex(this->validate_fen_regex))) {
+		LOG_F(INFO, "Valid FEN: %s", fen.c_str());
+	}
+	else {
+		LOG_F(ERROR, "Invalid FEN: %s! Using default FEN.", fen.c_str());
+		fen = this->default_fen;
+	}
+	int start, end, direction;
+	if (side == WHITE) {
+		start = 0;
+		end = 7;
+		direction = 1;
+	}
+	else {
+		start = 7;
+		end = 0;
+		direction = -1;
+	}
+	int x = start, y = 0;
+	for (char piece : fen) {
+		// If reached end of FEN
+		if (piece == ' ') {// || (y == 8 && (x == 0 || x == 7))) {
+			break;
+		}
+		// Reset x value and go down a row
+		if (piece == '/') {
+			x += direction;
+			y = 0;
+			continue;
+		}
+		if (isdigit(piece)) {
+			int inc = (int)piece - 48;
+			int stop = y + inc;
+			while (y < stop) {
+				this->g_game_board[x][y] = new Empty(x, y, EMPTY);
+				y++;
+			}
+			continue;
+		}
+		else {
+			this->g_game_board[x][y] = GetPiece(piece, x, y, side);
+			this->g_game_board[x][y]->g_coord = { x, y };
+		}
+		y++;
+	}
 }
 
 void Board::PrintBoard() {

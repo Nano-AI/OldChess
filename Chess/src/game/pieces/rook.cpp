@@ -7,7 +7,7 @@ Rook::Rook(int x, int y, int side) : Piece(x, y, side) {
 	this->g_piece = ROOK | side;
 }
 
-std::vector<Vector2> Rook::GetValidMoves(std::vector<std::vector<Piece*>> board, bool discovered_check) {
+std::vector<Vector2> Rook::GetValidMoves(std::vector<std::vector<Piece*>> board) {
 	std::vector<Vector2> moves;
 	int x = X();
 	int y = Y();
@@ -19,6 +19,7 @@ std::vector<Vector2> Rook::GetValidMoves(std::vector<std::vector<Piece*>> board,
 				break;
 			}
 			if (current->g_is_king) {
+				((King*)current)->g_in_check = true;
 				break;
 			}
 			moves.push_back({ i, y });
@@ -36,6 +37,7 @@ std::vector<Vector2> Rook::GetValidMoves(std::vector<std::vector<Piece*>> board,
 				break;
 			}
 			if (current->g_is_king) {
+				((King*)current)->g_in_check = true;
 				break;
 			}
 			moves.push_back({ x, i });

@@ -5,9 +5,10 @@ King::King(int x, int y, int side) : Piece(x, y, side) {
 	this->g_is_white = side == WHITE;
 	this->g_first_move = true;
 	this->g_piece = KING | side;
+	this->g_in_check = false;
 }
 
-std::vector<Vector2> King::GetValidMoves(std::vector<std::vector<Piece*>> board, bool discovered_check) {
+std::vector<Vector2> King::GetValidMoves(std::vector<std::vector<Piece*>> board) {
 	// TODO: Store moves in one array and only update it every move
 	std::vector<Vector2> moves;
 	std::vector<Vector2> compressed;

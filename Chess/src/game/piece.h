@@ -20,17 +20,19 @@ public:
 	Vector2 g_coord;
 	int g_side;
 	int g_piece;
-	Piece(Vector2 coord, int side);
-	Piece(int x, int y, int side);
+	std::vector<Vector2> g_moves;
+	void GenerateMoves(std::vector<std::vector<Piece*>> board);
 	int GetSide();
 	bool IsWhite();
 	int X();
 	int Y();
+	Piece(Vector2 coord, int side);
+	Piece(int x, int y, int side);
 	Vector2 GetCoord();
 	//virtual bool Move(int x, int y) = 0;
-	bool Move(int x, int y, std::vector<std::vector<Piece*>> board, bool discovered_check = false);
+	bool Move(int x, int y, std::vector<std::vector<Piece*>> board);
 	virtual Piece* Clone() = 0;
-	virtual std::vector<Vector2> GetValidMoves(std::vector<std::vector<Piece*>> board, bool discovered_check = false) = 0;
+	virtual std::vector<Vector2> GetValidMoves(std::vector<std::vector<Piece*>> board) = 0;
 	//virtual std::vector<Vector2> GetValidMoves(std::vector<std::vector<Piece*>> board, bool discovered_check = false) = 0;
 };
 

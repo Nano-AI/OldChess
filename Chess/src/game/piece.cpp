@@ -3,11 +3,13 @@
 Piece::Piece(int x, int y, int side) {
 	this->g_coord = { x, y };
 	this->g_side = side;
+	this->g_moves = std::vector<Vector2>();
 }
 
 Piece::Piece(Vector2 coord, int side) {
 	this->g_coord = coord;
 	this->g_side = side;
+	this->g_moves = std::vector<Vector2>();
 }
 
 int Piece::GetSide() {
@@ -30,9 +32,13 @@ Vector2 Piece::GetCoord() {
 	return this->g_coord;
 }
 
-bool Piece::Move(int x, int y, std::vector<std::vector<Piece*>> board, bool discovered_check) {
-	std::vector<Vector2> valid_moves = GetValidMoves(board, discovered_check);
-	for (Vector2 move : valid_moves) {
+void Piece::GenerateMoves(std::vector<std::vector<Piece*>> board) {
+	this->g_moves.clear();
+	this->g_moves = GetValidMoves(board);
+}
+
+bool Piece::Move(int x, int y, std::vector<std::vector<Piece*>> board) {
+	for (Vector2 move : this->g_moves) {
 		if (move.x == x && move.y == y) {
 			return true;
 		}

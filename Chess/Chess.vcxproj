@@ -188,6 +188,7 @@ echo All | xcopy $(ProjectDir)resources $(OutDir)resources /s /i </Command>
     <ClCompile Include="src\gui\window.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\game\file.h" />
     <ClInclude Include="src\gui\sound.h" />
     <ClInclude Include="src\game\errors.h" />
     <ClInclude Include="src\game\pieces\rook.h" />
@@ -217,6 +218,9 @@ echo All | xcopy $(ProjectDir)resources $(OutDir)resources /s /i </Command>
     <Image Include="resources\pieces\white\Pawn.png" />
     <Image Include="resources\pieces\white\Queen.png" />
     <Image Include="resources\pieces\white\Rook.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="resources\board.fen" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
