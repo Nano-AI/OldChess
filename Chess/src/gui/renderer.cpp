@@ -137,10 +137,10 @@ void Renderer::UpdateRect() {
 	for (int x = 0; x < 8; x++) {
 		for (int y = 0; y < 8; y++) {
 			SDL_Rect rect;
-			rect.x = (x * (size + 1)) + x_offset;
-			rect.y = (y * (size + 1)) + y_offset;
-			rect.w = size + 1;
-			rect.h = size + 1;
+			rect.x = (x * (size)) + x_offset;
+			rect.y = (y * (size)) + y_offset;
+			rect.w = size;
+			rect.h = size;
 			this->empty_spots[x][y]->g_box = rect;
 		}
 	}
@@ -183,13 +183,13 @@ void Renderer::DrawPiece(Piece* piece, SDL_Texture* piece_texture, Vector2 image
 	// Correct scaling to maintain aspect ratio of images
 	if (image_size.x > image_size.y) {
 		float ratio = (float)image_size.x / (float)image_size.y;
-		rect.w = size - 2 * INNER_PADDING;
+		rect.w = size;
 		rect.h = rect.w / ratio;
 
 	}
 	else {
 		float ratio = (float)image_size.y / (float)image_size.x;
-		rect.h = size - 2 * INNER_PADDING;
+		rect.h = size;
 		rect.w = rect.h / ratio;
 	}
 	// Set the size of the images
@@ -204,14 +204,14 @@ void Renderer::DrawPiece(Piece* piece, SDL_Texture* piece_texture, Vector2 image
 	}
 	else {
 		// Swap so we render up down instead of left right
-		rect.x = (y * (size + 1)) + x_offset;
-		rect.y = (x * (size + 1)) + y_offset;
+		rect.x = (y * (size)) + x_offset;
+		rect.y = (x * (size)) + y_offset;
 		// Center the piece in the box
 		rect.x += (size - rect.w) / 2;
 		rect.y += (size - rect.h) / 2;
 	}
 	piece->g_box = rect;
-	SDL_RenderDrawRect(this->win->g_renderer, &piece->g_box);
+	// SDL_RenderDrawRect(this->win->g_renderer, &piece->g_box);
 	// TODO: Error being thrown here after playing too many moves
 	/*
 	Exception thrown at 0x00007FFECCDA48BF (SDL2.dll) in Chess.exe: 0xC0000005: Access violation reading location 0x0000024D00001011.
@@ -269,10 +269,10 @@ void Renderer::DrawCheck() {
 	SDL_Surface* surface = this->win->g_surface;
 
 	SDL_Rect rect;
-	rect.x = (check->Y() * (size + 1) + x_offset);
-	rect.y = (check->X() * (size + 1) + y_offset);
-	rect.w = size + 1;
-	rect.h = size + 1;
+	rect.x = (check->Y() * (size) + x_offset);
+	rect.y = (check->X() * (size) + y_offset);
+	rect.w = size;
+	rect.h = size;
 	SDL_SetRenderDrawBlendMode(render, SDL_BLENDMODE_BLEND);
 	SDL_SetRenderDrawColor(render, check_color[0], check_color[1], check_color[2], check_color[3]);
 	SDL_RenderFillRect(render, &rect);
@@ -306,18 +306,18 @@ void Renderer::DrawMoves() {
 		SDL_SetRenderDrawColor(render, move_color[0], move_color[1], move_color[2], move_color[3]);
 		if (this->board->At(x, y)->g_piece == EMPTY) {
 			DrawCircle(render,
-				(y * (size + 1)) + x_offset + (size / 2),
-				(x * (size + 1)) + y_offset + (size / 2),
+				(y * (size)) + x_offset + (size / 2),
+				(x * (size)) + y_offset + (size / 2),
 				circle_size,
 				{  }
 			);
 		}
 		else {
 			SDL_Rect rect;
-			rect.x = (y * (size + 1) + x_offset);
-			rect.y = (x * (size + 1) + y_offset);
-			rect.w = size + 1;
-			rect.h = size + 1;
+			rect.x = (y * (size) + x_offset);
+			rect.y = (x * (size) + y_offset);
+			rect.w = size;
+			rect.h = size;
 			SDL_RenderFillRect(render, &rect);
 			SDL_RenderDrawRect(render, &rect);
 		}
