@@ -1,5 +1,5 @@
 # Chess 
-
+> Big thanks to [Lichess](https://github.com/lichess-org/lila) since all of the assets used in this project are directly taken from them!
 Chess made in C++ using SDL2.
 
 ### Ideas

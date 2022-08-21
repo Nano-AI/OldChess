@@ -35,6 +35,7 @@ public:
 	void DrawMoves();
 	void DrawCheck();
 	void DrawPiece(Piece* piece, SDL_Texture* piece_texture, Vector2 image_size, RenderMathValues values);
+	void UpdateRect();
 	int HandleInput(SDL_Event* event);
 private:
 	bool mouse_down;
@@ -45,11 +46,17 @@ private:
 	SDL_Point mouse_pos;
 	Piece* selected_piece;
 	json settings;
+	SDL_Texture* board_image;
 	std::vector<std::vector<Empty*>> empty_spots;
 	std::vector<std::vector<
 		std::vector<Vector2>
 	>> moves;
 	std::map<int, Vector2> sizes;
+	std::vector<int> light_square_rgb;
+	std::vector<int> dark_square_rgb;
+	std::vector<int> background_rgb;
+	std::vector<int> move_color;
+	std::vector<int> check_color;
 	void MouseUp(SDL_Event* event);
 	//int FilterEvent(void* userdata, SDL_Event* event);
 };

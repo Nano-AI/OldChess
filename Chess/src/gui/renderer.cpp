@@ -5,11 +5,6 @@ void DrawCircle(SDL_Renderer* renderer, int x, int y, int radius, SDL_Color colo
 
 // Just colors for the board
 // I'll switch these to SDL_Color eventually.
-static int light_square_rgb[3] = { 243, 242, 242 };
-static int dark_square_rgb[3] = { 125, 135, 150 };
-static int background_rgb[3] = { 100, 100, 100 };
-static int move_color[4] = { 180, 200, 155, 200 };
-static int check_color[4] = { 255, 0, 0, 100 };
 
 int FilterEvent(void* userdata, SDL_Event* event);
 
@@ -35,7 +30,15 @@ Renderer::Renderer(Window* win, Board* board, json settings) : win(this->win), b
 	SDL_SetEventFilter(FilterEvent, this);
 	Image* image = new Image(win);
 	image->LoadPieces(settings["pieces"]);
+	this->board_image = Image::LoadImage(this->win->g_renderer, ((std::string)settings["board"]["board-image"]).c_str());
 	this->images = image;
+	auto colors = settings["board"]["colors"];
+
+	// SetupColor(&this->light_square_rgb, colors["light"]);
+
+	// Set this stuff up
+	// this->move_color
+	// this->check_color
 
 	// Get sizes of images
 	for (auto& [piece, texture] : this->images->g_pieces_images) {
@@ -71,6 +74,7 @@ Renderer::Renderer(Window* win, Board* board, json settings) : win(this->win), b
 	}
 
 	this->sound = new Sound(settings["sounds"]);
+	UpdateRect();
 	UpdateMoves();
 	LOG_F(INFO, "Setup renderer.");
 }
@@ -80,22 +84,34 @@ Renderer::~Renderer() {
 }
 
 void Renderer::Render(bool filter_event) {
-	if (filter_event) {
-		SDL_GetWindowSize(win->g_window, &win->g_width, &win->g_height);
-	}
+	//if (filter_event) {
+	//	SDL_GetWindowSize(win->g_window, &win->g_width, &win->g_height);
+	//	UpdateRect();
+	//}
 	SDL_RenderClear(this->win->g_renderer);
-	DrawBoard();
-	DrawMoves();
-	DrawCheck();
-	DrawPieces();
-	SDL_SetRenderDrawColor(this->win->g_renderer, background_rgb[0], background_rgb[1], background_rgb[2], 255);
-	//DrawPossibleMoves(this->pov_white);
+	//DrawBoard(); // Causing memeory spike
+	//DrawMoves();
+	//DrawCheck();
+	//DrawPieces();
 	SDL_RenderPresent(this->win->g_renderer);
 }
 
 void Renderer::DrawBoard() {
 	// Get the renderer and clear it
-	SDL_Renderer* render = win->g_renderer;
+	SDL_Renderer* render = this->win->g_renderer;
+	auto values = CalculateDetails(this->win);
+	auto size = values.size;
+	auto x_offset = values.x_offset;
+	auto y_offset = values.y_offset;
+	SDL_Rect rect;
+	rect.x = x_offset;
+	rect.y = y_offset;
+	rect.w = values.shortest;
+	rect.h = values.shortest;
+	SDL_RenderCopy(render, this->board_image, NULL, &rect);
+}
+
+void Renderer::UpdateRect() {
 	auto values = CalculateDetails(this->win);
 	auto size = values.size;
 	auto x_offset = values.x_offset;
@@ -108,16 +124,9 @@ void Renderer::DrawBoard() {
 			rect.w = size + 1;
 			rect.h = size + 1;
 			this->empty_spots[x][y]->g_box = rect;
-			if (this->board->g_board_colors[x][y] == WHITE) {
-				SDL_SetRenderDrawColor(render, light_square_rgb[0], light_square_rgb[1], light_square_rgb[2], 255);
-			}
-			else {
-				SDL_SetRenderDrawColor(render, dark_square_rgb[0], dark_square_rgb[1], dark_square_rgb[2], 255);
-			}
-			SDL_RenderFillRect(render, &rect);
 		}
 	}
-	SDL_SetRenderDrawColor(render, background_rgb[0], background_rgb[1], background_rgb[2], 255);
+
 }
 
 void Renderer::DrawPieces() {
@@ -290,7 +299,7 @@ void Renderer::DrawMoves() {
 			rect.y = (x * (size + 1) + y_offset);
 			rect.w = size + 1;
 			rect.h = size + 1;
-			SDL_SetRenderDrawColor(render, move_color[0], move_color[1], move_color[2], move_color[3]);
+			//SDL_SetRenderDrawColor(render, move_color[0], move_color[1], move_color[2], move_color[3]);
 			SDL_RenderFillRect(render, &rect);
 			SDL_RenderDrawRect(render, &rect);
 		}
@@ -394,7 +403,7 @@ int FilterEvent(void* userdata, SDL_Event* event) {
 	if (event->type == SDL_WINDOWEVENT && event->window.event == SDL_WINDOWEVENT_RESIZED) {
 		// convert userdata pointer to yours and trigger your own draw function
 		// this is called very often now
-		// IMPORTANT: Might be called from a different thread, see SDL_SetEventFilter docs	
+		// IMPORTANT: Might be called from a different thread, see SDL_SetEventFilter docs
 		((Renderer*)userdata)->Render(true);
 		//return 0 if you don't want to handle this event twice
 		return 0;
@@ -404,7 +413,7 @@ int FilterEvent(void* userdata, SDL_Event* event) {
 }
 
 void DrawCircle(SDL_Renderer* renderer, int x, int y, int radius, SDL_Color color) {
-	SDL_SetRenderDrawColor(renderer, color.r, color.g, color.b, color.a);
+	// SDL_SetRenderDrawColor(renderer, color.r, color.g, color.b, color.a);
 	for (int w = 0; w < radius * 2; w++)
 	{
 		for (int h = 0; h < radius * 2; h++)

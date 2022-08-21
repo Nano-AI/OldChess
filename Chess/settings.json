@@ -2,13 +2,14 @@
 	"board": {
 		"fen": "3qr1k1/r3bp1p/p1n1pnp1/1p1b2B1/7Q/1BN2N2/PP3PPP/3RR1K1 w - - 6 19",
 		"side": "white",
-		"color": {
-			"white": {
+		"board-image":  "./resources/boards/newspaper.png",
+		"colors": {
+			"light": {
 				"r": "243",
 				"g": "242",
 				"b": "242"
 			},
-			"black": {
+			"dark": {
 				"r": "125",
 				"g": "135",
 				"b": "150"
