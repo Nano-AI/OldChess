@@ -1,0 +1,2 @@
+# Deletes all unneeded audio files
+find . ! -name Capture.ogg ! -name Check.ogg ! -name Move.ogg ! -name Castle.ogg ! -name Defeat.ogg ! -name Draw.ogg ! -name Error.ogg ! -name GenericNotify.ogg ! -name Victory.ogg ! -name LowTime.ogg ! -name NewChatMessage.ogg ! -name remove.sh -type f -delete

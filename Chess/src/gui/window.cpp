@@ -16,7 +16,7 @@ Window::Window(int width, int height, std::string title) {
 		title.c_str(),
 		SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
 		width, height, 
-		SDL_WINDOW_SHOWN | SDL_WINDOW_RESIZABLE);
+		SDL_WINDOW_SHOWN /* | SDL_WINDOW_RESIZABLE*/);
 	SDL_Surface* screenSurface = SDL_GetWindowSurface(window);
 	SDL_Renderer* renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
 	if (window == NULL) {

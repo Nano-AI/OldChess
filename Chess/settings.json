@@ -46,7 +46,7 @@
 		}
 	},
 	"sounds": {
-		"directory": "./resources/sounds/standard/",
+		"directory": "./resources/sounds/chess.com/",
 		"extension": ".mp3",
 		"events": {
 			"Capture": "Capture",

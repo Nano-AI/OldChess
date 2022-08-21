@@ -8,6 +8,10 @@
 #include <json.hpp>
 #include <vector>
 #include <map>
+#include <filesystem>
+
+namespace fs = std::filesystem;
+
 
 #define SOUND_MOVE      "Move"
 #define SOUND_CAPTURE   "Capture"
