@@ -37,6 +37,7 @@ public:
 	void DrawPiece(Piece* piece, SDL_Texture* piece_texture, Vector2 image_size, RenderMathValues values);
 	void UpdateRect();
 	int HandleInput(SDL_Event* event);
+	static int FilterEvent(void* userdata, SDL_Event* event);
 private:
 	bool mouse_down;
 	Sound* sound;
@@ -52,12 +53,10 @@ private:
 		std::vector<Vector2>
 	>> moves;
 	std::map<int, Vector2> sizes;
-	std::vector<int> light_square_rgb;
-	std::vector<int> dark_square_rgb;
 	std::vector<int> background_rgb;
 	std::vector<int> move_color;
 	std::vector<int> check_color;
+	std::string uuid;
 	void MouseUp(SDL_Event* event);
-	//int FilterEvent(void* userdata, SDL_Event* event);
 };
 

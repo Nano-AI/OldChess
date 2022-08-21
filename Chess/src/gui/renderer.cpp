@@ -1,5 +1,8 @@
 #include "renderer.h"
+#include "Header.h"
 #define INNER_PADDING 10
+#include <random>
+#include <sstream>
 
 void DrawCircle(SDL_Renderer* renderer, int x, int y, int radius, SDL_Color color);
 
@@ -23,11 +26,17 @@ RenderMathValues CalculateDetails(Window* win) {
 	return board;
 }
 
+int ToInt(auto value) {
+	return std::stoi(((std::string)value).c_str());
+}
+
 Renderer::Renderer(Window* win, Board* board, json settings) : win(this->win), board(this->board) {
 	this->win = win;
 	this->board = board;
 	this->settings = settings;
-	SDL_SetEventFilter(FilterEvent, this);
+	Test* value = new Test();
+	//SDL_SetEventFilter(&this::FilterEvent, this);
+	//SDL_SetEventFilter(FilterEvent, value);
 	Image* image = new Image(win);
 	image->LoadPieces(settings["pieces"]);
 	this->board_image = Image::LoadImage(this->win->g_renderer, ((std::string)settings["board"]["board-image"]).c_str());
@@ -48,7 +57,6 @@ Renderer::Renderer(Window* win, Board* board, json settings) : win(this->win), b
 		SDL_QueryTexture(texture, NULL, NULL, &x, &y);
 		this->sizes.insert(std::pair<int, Vector2>(p, { x, y }));
 	}
-
 
 	auto values = CalculateDetails(this->win);
 	auto size = values.size;
@@ -74,25 +82,35 @@ Renderer::Renderer(Window* win, Board* board, json settings) : win(this->win), b
 	}
 
 	this->sound = new Sound(settings["sounds"]);
+	
+	auto c = this->settings["board"]["colors"]["move"];
+	this->move_color = { ToInt(c["r"]), ToInt(c["g"]), ToInt(c["b"]), ToInt(c["a"])};
+	c = this->settings["board"]["colors"]["background"];
+	this->background_rgb = { ToInt(c["r"]), ToInt(c["g"]), ToInt(c["b"]) };
+	c = this->settings["board"]["colors"]["check"];
+	this->check_color = { ToInt(c["r"]), ToInt(c["g"]), ToInt(c["b"]), ToInt(c["a"])};
 	UpdateRect();
 	UpdateMoves();
 	LOG_F(INFO, "Setup renderer.");
 }
 
 Renderer::~Renderer() {
+	//delete(this->win);
 	delete(this->sound);
 }
 
 void Renderer::Render(bool filter_event) {
-	//if (filter_event) {
-	//	SDL_GetWindowSize(win->g_window, &win->g_width, &win->g_height);
-	//	UpdateRect();
-	//}
+	if (filter_event) {
+		SDL_GetWindowSize(win->g_window, &win->g_width, &win->g_height);
+		UpdateRect();
+		return;
+	}
+	SDL_SetRenderDrawColor(this->win->g_renderer, this->background_rgb[0], this->background_rgb[0], this->background_rgb[1], this->background_rgb[2]);
 	SDL_RenderClear(this->win->g_renderer);
-	//DrawBoard(); // Causing memeory spike
-	//DrawMoves();
-	//DrawCheck();
-	//DrawPieces();
+	DrawBoard();
+	DrawMoves();
+	DrawCheck();
+	DrawPieces();
 	SDL_RenderPresent(this->win->g_renderer);
 }
 
@@ -126,7 +144,6 @@ void Renderer::UpdateRect() {
 			this->empty_spots[x][y]->g_box = rect;
 		}
 	}
-
 }
 
 void Renderer::DrawPieces() {
@@ -194,6 +211,7 @@ void Renderer::DrawPiece(Piece* piece, SDL_Texture* piece_texture, Vector2 image
 		rect.y += (size - rect.h) / 2;
 	}
 	piece->g_box = rect;
+	SDL_RenderDrawRect(this->win->g_renderer, &piece->g_box);
 	// TODO: Error being thrown here after playing too many moves
 	/*
 	Exception thrown at 0x00007FFECCDA48BF (SDL2.dll) in Chess.exe: 0xC0000005: Access violation reading location 0x0000024D00001011.
@@ -285,12 +303,13 @@ void Renderer::DrawMoves() {
 			continue;
 		}
 		SDL_SetRenderDrawBlendMode(render, SDL_BLENDMODE_BLEND);
+		SDL_SetRenderDrawColor(render, move_color[0], move_color[1], move_color[2], move_color[3]);
 		if (this->board->At(x, y)->g_piece == EMPTY) {
 			DrawCircle(render,
 				(y * (size + 1)) + x_offset + (size / 2),
 				(x * (size + 1)) + y_offset + (size / 2),
 				circle_size,
-				{ 180, 200, 155, 200 }
+				{  }
 			);
 		}
 		else {
@@ -299,7 +318,6 @@ void Renderer::DrawMoves() {
 			rect.y = (x * (size + 1) + y_offset);
 			rect.w = size + 1;
 			rect.h = size + 1;
-			//SDL_SetRenderDrawColor(render, move_color[0], move_color[1], move_color[2], move_color[3]);
 			SDL_RenderFillRect(render, &rect);
 			SDL_RenderDrawRect(render, &rect);
 		}
@@ -313,7 +331,6 @@ int Renderer::HandleInput(SDL_Event* event) {
 	case SDL_WINDOWEVENT:
 		if (event->type == SDL_WINDOWEVENT && (event->window.event == SDL_WINDOWEVENT_RESIZED || event->window.event == SDL_WINDOWEVENT_SIZE_CHANGED)) {
 			LOG_F(INFO, "Resizing window...");
-			DrawBoard();
 			this->win->ResizeWindow(event->window.data1, event->window.data2);
 		}
 		break;
@@ -399,12 +416,13 @@ void Renderer::MouseUp(SDL_Event* event) {
 	}
 }
 
-int FilterEvent(void* userdata, SDL_Event* event) {
+int Renderer::FilterEvent(void* userdata, SDL_Event* event) {
 	if (event->type == SDL_WINDOWEVENT && event->window.event == SDL_WINDOWEVENT_RESIZED) {
 		// convert userdata pointer to yours and trigger your own draw function
 		// this is called very often now
 		// IMPORTANT: Might be called from a different thread, see SDL_SetEventFilter docs
-		((Renderer*)userdata)->Render(true);
+		// ((Renderer*)userdata)->Render(true);
+		//static_cast<Renderer*>(userdata)->Render(true);
 		//return 0 if you don't want to handle this event twice
 		return 0;
 	}
@@ -413,7 +431,7 @@ int FilterEvent(void* userdata, SDL_Event* event) {
 }
 
 void DrawCircle(SDL_Renderer* renderer, int x, int y, int radius, SDL_Color color) {
-	// SDL_SetRenderDrawColor(renderer, color.r, color.g, color.b, color.a);
+//	SDL_SetRenderDrawColor(renderer, color.r, color.g, color.b, color.a);
 	for (int w = 0; w < radius * 2; w++)
 	{
 		for (int h = 0; h < radius * 2; h++)

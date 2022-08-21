@@ -9,6 +9,27 @@
 #include "./game/piece.h"
 #include "./game/pieces/pawn.h"
 
+Board* board;
+Window* win;
+Renderer* render;
+SDL_Event event;
+
+int FilterEvent(void* userdata, SDL_Event* event) {
+	if (event->type == SDL_WINDOWEVENT && event->window.event == SDL_WINDOWEVENT_RESIZED) {
+		// convert userdata pointer to yours and trigger your own draw function
+		// this is called very often now
+		// IMPORTANT: Might be called from a different thread, see SDL_SetEventFilter docs
+		// ((Renderer*)userdata)->Render(true);
+		render->Render(true);
+		//static_cast<Renderer*>(userdata)->Render(true);
+		//return 0 if you don't want to handle this event twice
+		return 0;
+	}
+	//important to allow all events, or your SDL_PollEvent doesn't get any event
+	return 1;
+}
+
+
 int main(int argc, char* argv[]) {
 	loguru::init(argc, argv);
 	loguru::add_file("Chess.log", loguru::Append, loguru::Verbosity_MAX);
@@ -19,18 +40,18 @@ int main(int argc, char* argv[]) {
 	json data = json::parse(f);
 
 	// Play as white or black
-	Board board(data);
-	Window win(800, 800, "Chess");
-	Renderer render(&win, &board, data);
-	SDL_Event event;
+	board = new Board(data);
+	win = new Window(800, 800, "Chess");
+	render = new Renderer(win, board, data);
 	
+	SDL_SetEventFilter(FilterEvent, NULL);
 	bool done = false;
 
 	while ((!done) && (SDL_WaitEvent(&event))) {
 		//render.Update();
-		render.HandleInput(&event);
-		render.Render();
-		win.HandleInput(&event);
+		render->HandleInput(&event);
+		render->Render();
+		win->HandleInput(&event);
 		// Render handles window resize
 		switch (event.type) {
 		case SDL_QUIT:
@@ -41,6 +62,6 @@ int main(int argc, char* argv[]) {
 		}
 	}
 
-	win.Quit(0);
+	win->Quit(0);
 	return 0;
 }

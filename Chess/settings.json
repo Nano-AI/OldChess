@@ -4,16 +4,6 @@
 		"side": "white",
 		"board-image":  "./resources/boards/newspaper.png",
 		"colors": {
-			"light": {
-				"r": "243",
-				"g": "242",
-				"b": "242"
-			},
-			"dark": {
-				"r": "125",
-				"g": "135",
-				"b": "150"
-			},
 			"check": {
 				"r": "255",
 				"g": "0",
