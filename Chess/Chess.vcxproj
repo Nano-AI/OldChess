@@ -99,8 +99,9 @@
     </Link>
     <PreBuildEvent>
       <Command>copy $(SolutionDir)lib\*.dll $(OutDir)
-echo All | xcopy $(ProjectDir)resources $(OutDir)resources /s /i 
+echo All | xcopy $(ProjectDir)resources $(OutDir)resources /s /i /exclude:$(ProjectDir)excludedfileslist.txt
 copy $(ProjectDir)*.json $(OutDir)</Command>
+      <Message>First copies all the DLL files into the build folder, copies all resource files (other than SVG's), then copies the settings.json file.</Message>
     </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -124,8 +125,9 @@ copy $(ProjectDir)*.json $(OutDir)</Command>
     </Link>
     <PreBuildEvent>
       <Command>copy $(SolutionDir)lib\*.dll $(OutDir)
-echo All | xcopy $(ProjectDir)resources $(OutDir)resources /s /i 
+echo All | xcopy $(ProjectDir)resources $(OutDir)resources /s /i /exclude:$(ProjectDir)excludedfileslist.txt
 copy $(ProjectDir)*.json $(OutDir)</Command>
+      <Message>First copies all the DLL files into the build folder, copies all resource files (other than SVG's), then copies the settings.json file.</Message>
     </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -145,8 +147,9 @@ copy $(ProjectDir)*.json $(OutDir)</Command>
     </Link>
     <PreBuildEvent>
       <Command>copy $(SolutionDir)lib\*.dll $(OutDir)
-echo All | xcopy $(ProjectDir)resources $(OutDir)resources /s /i 
+echo All | xcopy $(ProjectDir)resources $(OutDir)resources /s /i /exclude:$(ProjectDir)excludedfileslist.txt
 copy $(ProjectDir)*.json $(OutDir)</Command>
+      <Message>First copies all the DLL files into the build folder, copies all resource files (other than SVG's), then copies the settings.json file.</Message>
     </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -170,8 +173,9 @@ copy $(ProjectDir)*.json $(OutDir)</Command>
     </Link>
     <PreBuildEvent>
       <Command>copy $(SolutionDir)lib\*.dll $(OutDir)
-echo All | xcopy $(ProjectDir)resources $(OutDir)resources /s /i 
+echo All | xcopy $(ProjectDir)resources $(OutDir)resources /s /i /exclude:$(ProjectDir)excludedfileslist.txt
 copy $(ProjectDir)*.json $(OutDir)</Command>
+      <Message>First copies all the DLL files into the build folder, copies all resource files (other than SVG's), then copies the settings.json file.</Message>
     </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
@@ -192,7 +196,7 @@ copy $(ProjectDir)*.json $(OutDir)</Command>
     <ClCompile Include="src\gui\window.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="src\game\file.h" />
+    <ClInclude Include="src\file.h" />
     <ClInclude Include="src\gui\sound.h" />
     <ClInclude Include="src\game\errors.h" />
     <ClInclude Include="src\game\pieces\rook.h" />
@@ -224,7 +228,12 @@ copy $(ProjectDir)*.json $(OutDir)</Command>
     <Image Include="resources\pieces\white\Rook.png" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="resources\pieces\convert.sh" />
+    <None Include="resources\sounds\sounds\remove.sh" />
     <None Include="settings.json" />
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="src\excludedfileslist.txt" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

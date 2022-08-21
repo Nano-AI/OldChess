@@ -1,7 +1,9 @@
 #include "sound.h"
 
 
-Sound::Sound() {
+Sound::Sound(json settings) {
+	LOG_F(INFO, "Initializing sounds...");
+	this->settings = settings;
 	int result = 0;
 	int flags = MIX_INIT_MP3;
 	if (SDL_Init(SDL_INIT_AUDIO) < 0) {
@@ -11,8 +13,12 @@ Sound::Sound() {
 		LOG_F(FATAL, "Could not initialize mixer: %d. Error:\n%s", result, SDL_GetError());
 	}
 	Mix_OpenAudio(22050, AUDIO_S16SYS, 2, 640);
-	for (auto const& [event, filename] : this->c_sound_name) {
-		Mix_Music* music = Mix_LoadMUS((this->sound_dir + filename).c_str());
+	std::cout << settings << "\n" << settings["events"] << std::endl;
+	for (auto const& item : settings["events"].items()) {
+		std::string event = item.key();
+		// Have to do this stupid thing because the guy who made SDL_Mixer thought that audio files didn't need to be relative
+		std::string filename = (std::string) settings["directory"] + (std::string)item.value() + (std::string)settings["extension"];
+		Mix_Music* music = Mix_LoadMUS((SDL_GetBasePath() + filename).c_str());
 		sounds.insert(std::pair(event, music));
 		LOG_F(INFO, "Loaded event \"%s\" from file \"%s\".", event.c_str(), filename.c_str());
 	}

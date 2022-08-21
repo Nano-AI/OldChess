@@ -21,7 +21,7 @@
 #include "./pieces/queen.h"
 #include "./pieces/king.h"
 #include "./errors.h"
-#include "./file.h"
+#include "../file.h"
 
 using json = nlohmann::json;
 

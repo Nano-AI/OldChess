@@ -41,5 +41,4 @@ public:
 		{ "Queen" , QUEEN  },
 		{ "King"  , KING   }
 	};
-
 };

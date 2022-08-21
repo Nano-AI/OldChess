@@ -13,13 +13,15 @@ int main(int argc, char* argv[]) {
 	loguru::init(argc, argv);
 	loguru::add_file("Chess.log", loguru::Append, loguru::Verbosity_MAX);
 
+	LOG_F(INFO, "Reading settings");
+
 	std::ifstream f("settings.json");
 	json data = json::parse(f);
 
 	// Play as white or black
 	Board board(data);
 	Window win(800, 800, "Chess");
-	Renderer render(&win, &board);
+	Renderer render(&win, &board, data);
 	SDL_Event event;
 	
 	bool done = false;

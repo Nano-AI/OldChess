@@ -24,7 +24,7 @@ class Renderer
 {
 public:
 	bool pov_white;
-	Renderer(Window* win, Board* board);
+	Renderer(Window* win, Board* board, json settings);
 	~Renderer();
 	void UpdateMoves();
 	void ClearMoves();
@@ -44,6 +44,7 @@ private:
 	Board* board;
 	SDL_Point mouse_pos;
 	Piece* selected_piece;
+	json settings;
 	std::vector<std::vector<Empty*>> empty_spots;
 	std::vector<std::vector<
 		std::vector<Vector2>

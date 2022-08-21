@@ -6,10 +6,13 @@
 #include <filesystem>
 #include <loguru.hpp>
 #include <map>
+#include <json.hpp>
 #include "window.h"
 #include "../game/pieces.h"
+#include "../file.h"
 
 namespace fs = std::filesystem;
+using json = nlohmann::json;
 
 class Image
 {
@@ -19,7 +22,10 @@ public:
 	//Image(Window* window);
 	Image(Window* win);
 	static SDL_Texture* LoadImage(SDL_Renderer* renderer, const char* file);
-	std::map<int, SDL_Texture*> LoadDirectory(const char* directory, int side = WHITE);
-	void LoadPieces(const char* white_dir, const char* black_dir);
+	static SDL_Texture* LoadSVG(SDL_Renderer* renderer, const char* file);
+	std::map<int, SDL_Texture*> LoadDirectory(std::string directory, int side = WHITE);
+	void LoadPieces(json settings);
 	//SDL_Surface* g_loaded_images[12];
+protected:
+	json settings;
 };

@@ -113,7 +113,7 @@
     <ClInclude Include="src\gui\sound.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\game\file.h">
+    <ClInclude Include="src\file.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -157,5 +157,10 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="settings.json" />
+    <None Include="resources\pieces\convert.sh" />
+    <None Include="resources\sounds\sounds\remove.sh" />
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="src\excludedfileslist.txt" />
   </ItemGroup>
 </Project>

@@ -11,9 +11,6 @@ static int background_rgb[3] = { 100, 100, 100 };
 static int move_color[4] = { 180, 200, 155, 200 };
 static int check_color[4] = { 255, 0, 0, 100 };
 
-const char* c_white_dir = "./resources/pieces/white";
-const char* c_black_dir = "./resources/pieces/black";
-
 int FilterEvent(void* userdata, SDL_Event* event);
 
 bool CoordEqual(Vector2* point1, Vector2* point2) {
@@ -31,14 +28,13 @@ RenderMathValues CalculateDetails(Window* win) {
 	return board;
 }
 
-Renderer::Renderer(Window* win, Board* board) : win(this->win), board(this->board) {
-	// I need this cause it doesn't work without it :/
+Renderer::Renderer(Window* win, Board* board, json settings) : win(this->win), board(this->board) {
 	this->win = win;
 	this->board = board;
-	// If it should be drawed from white's point of view.
+	this->settings = settings;
 	SDL_SetEventFilter(FilterEvent, this);
 	Image* image = new Image(win);
-	image->LoadPieces(c_white_dir, c_black_dir);
+	image->LoadPieces(settings["pieces"]);
 	this->images = image;
 
 	// Get sizes of images
@@ -74,7 +70,7 @@ Renderer::Renderer(Window* win, Board* board) : win(this->win), board(this->boar
 		}
 	}
 
-	this->sound = new Sound();
+	this->sound = new Sound(settings["sounds"]);
 	UpdateMoves();
 	LOG_F(INFO, "Setup renderer.");
 }
