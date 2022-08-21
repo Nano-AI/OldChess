@@ -12,6 +12,10 @@ Chess made in C++ using SDL2.
 
 This is a small Chess project where you can play Chess against yourself. It's made using SDL2, SDL_image, SDL_mixer, and Loguru.
 
+
+## Screenshots
+![Screenshot #1](https://github.com/Nano-AI/Chess/tree/master/Screenshots/1.png)
+
 ## Getting Started
 
 ### Dependencies
