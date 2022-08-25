@@ -21,6 +21,8 @@ public:
 	int g_side;
 	int g_piece;
 	std::vector<Vector2> g_moves;
+	std::vector<Vector2> g_protected_spots; // This includes pieces the same side
+	std::vector<Vector2> g_xray;
 	void GenerateMoves(std::vector<std::vector<Piece*>> board);
 	int GetSide();
 	bool IsWhite();
@@ -32,7 +34,8 @@ public:
 	//virtual bool Move(int x, int y) = 0;
 	bool Move(int x, int y, std::vector<std::vector<Piece*>> board);
 	virtual Piece* Clone() = 0;
-	virtual std::vector<Vector2> GetValidMoves(std::vector<std::vector<Piece*>> board) = 0;
+	virtual std::vector<Vector2> GetValidMoves(std::vector<std::vector<Piece*>> board, bool xray = false) = 0;
+	virtual std::vector<Vector2> MovesToPiece(Piece* end, std::vector<std::vector<Piece*>> board) = 0;
 	//virtual std::vector<Vector2> GetValidMoves(std::vector<std::vector<Piece*>> board, bool discovered_check = false) = 0;
 };
 

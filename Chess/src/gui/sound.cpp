@@ -19,7 +19,9 @@ Sound::Sound(json settings) {
 		std::string filename = (std::string) settings["directory"] + (std::string)item.value() + (std::string)settings["extension"];
 		std::string path = std::filesystem::absolute(filename).string();
 		Mix_Music* music = Mix_LoadMUS(path.c_str());
-		std::cout << Mix_GetError() << std::endl;
+		if (!music) {
+			LOG_F(ERROR, "%s", Mix_GetError());
+		}
 		sounds.insert(std::pair(event, music));
 		LOG_F(INFO, "Loaded event \"%s\" from file \"%s\".", event.c_str(), filename.c_str());
 	}

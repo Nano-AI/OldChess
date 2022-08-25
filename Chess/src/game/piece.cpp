@@ -31,10 +31,25 @@ int Piece::Y() {
 Vector2 Piece::GetCoord() {
 	return this->g_coord;
 }
-
 void Piece::GenerateMoves(std::vector<std::vector<Piece*>> board) {
 	this->g_moves.clear();
-	this->g_moves = GetValidMoves(board);
+	this->g_protected_spots.clear();
+	this->g_xray.clear();
+	std::vector<Vector2> moves = GetValidMoves(board);
+	this->g_xray = GetValidMoves(board, true);
+	for (auto move : moves) {
+		Piece* spot = board[move.x][move.y];
+		if (spot->g_side != this->g_side || (spot->g_piece == EMPTY && spot->g_side == EMPTY)) {
+			g_moves.push_back(move);
+		}
+		this->g_protected_spots.push_back(move);
+	}
+	for (auto move : this->g_xray) {
+		Piece* spot = board[move.x][move.y];
+		if (spot->g_piece == BLANK) {
+			continue;
+		}
+	}
 }
 
 bool Piece::Move(int x, int y, std::vector<std::vector<Piece*>> board) {

@@ -7,7 +7,6 @@ Image::Image(Window* win) {
 void Image::LoadPieces(json settings) {
     // Create basic vector with all the peices
     // Get the loaded peices
-    std::cout << settings << std::endl;
     this->settings = settings;
 	std::string white_dir = (std::string)settings["base-directory"] + (std::string)settings["white-directory"];
 	std::string black_dir = (std::string)settings["base-directory"] + (std::string)settings["black-directory"];

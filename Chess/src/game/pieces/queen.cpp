@@ -7,13 +7,13 @@ Queen::Queen(int x, int y, int side) : Piece(x, y, side) {
 	this->g_piece = QUEEN | side;
 }
 
-std::vector<Vector2> Queen::GetValidMoves(std::vector<std::vector<Piece*>> board) {
+std::vector<Vector2> Queen::GetValidMoves(std::vector<std::vector<Piece*>> board, bool xray) {
 	std::vector<Vector2> moves = {};
 	int x = this->X(), y = this->Y();
 	Bishop* b = new Bishop(x, y, this->g_side);
-	std::vector<Vector2> b_moves = b->GetValidMoves(board);
+	std::vector<Vector2> b_moves = b->GetValidMoves(board, xray);
 	Rook* r = new Rook(x, y, this->g_side);
-	std::vector<Vector2> r_moves = r->GetValidMoves(board);
+	std::vector<Vector2> r_moves = r->GetValidMoves(board, xray);
 	for (auto move : b_moves) {
 		moves.push_back(move);
 	}
@@ -25,6 +25,28 @@ std::vector<Vector2> Queen::GetValidMoves(std::vector<std::vector<Piece*>> board
 	delete(b);
 	delete(r);
 	return moves;
+}
+
+std::vector<Vector2> Queen::MovesToPiece(Piece* end, std::vector<std::vector<Piece*>> board) {
+	std::vector<Vector2> spots = {};
+	int x = X(), y = Y();
+	Bishop* b = new Bishop(x, y, this->g_side);
+	std::vector<Vector2> b_moves = b->MovesToPiece(end, board);
+	Rook* r = new Rook(x, y, this->g_side);
+	std::vector<Vector2> r_moves = r->MovesToPiece(end, board);
+	for (auto r_move : r_moves) {
+		for (auto b_move : b_moves) {
+			if (r_move.x == b_move.x && r_move.y == b_move.y) {
+				spots.push_back(r_move);
+			}
+		}
+	}
+	r_moves.clear();
+	b_moves.clear();
+	delete(b);
+	delete(r);
+	return spots;
+
 }
 
 Piece* Queen::Clone() {
