@@ -28,23 +28,7 @@ std::vector<Vector2> Queen::GetValidMoves(std::vector<std::vector<Piece*>> board
 }
 
 std::vector<Vector2> Queen::MovesToPiece(Piece* end, std::vector<std::vector<Piece*>> board) {
-	std::vector<Vector2> spots = {};
-	int x = X(), y = Y();
-	Bishop* b = new Bishop(x, y, this->g_side);
-	std::vector<Vector2> b_moves = b->MovesToPiece(end, board);
-	Rook* r = new Rook(x, y, this->g_side);
-	std::vector<Vector2> r_moves = r->MovesToPiece(end, board);
-	for (auto r_move : r_moves) {
-		for (auto b_move : b_moves) {
-			if (r_move.x == b_move.x && r_move.y == b_move.y) {
-				spots.push_back(r_move);
-			}
-		}
-	}
-	r_moves.clear();
-	b_moves.clear();
-	delete(b);
-	delete(r);
+	std::vector<Vector2> spots = { {0, 0} };
 	return spots;
 
 }

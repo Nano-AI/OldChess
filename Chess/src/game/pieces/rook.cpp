@@ -63,10 +63,10 @@ std::vector<Vector2> Rook::GetValidMoves(std::vector<std::vector<Piece*>> board,
 				break;
 			}
 			if (current->g_is_king && current->g_side != this->g_side) {
-				if (!xray) {
+				//if (!xray) {
 					((King*)current)->g_in_check = true;
 					break;
-				}
+				//}
 			}
 			if (!xray)
 				moves.push_back({ x, i });	

@@ -1,4 +1,5 @@
 # Chess 
+> This project isn't finished but I've archived and will work on it some day.
 > Big thanks to [Lichess](https://github.com/lichess-org/lila) since all of the assets used in this project are directly taken from them!
 > Also, thanks to [this YouTube video](https://www.youtube.com/watch?v=7skwR49UhqA) for the chess.com sound effects!
 Chess made in C++ using SDL2.

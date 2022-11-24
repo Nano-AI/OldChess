@@ -69,8 +69,8 @@ std::vector<Vector2> Bishop::MovesToPiece(Piece* end, std::vector<std::vector<Pi
 		// WE'RE TALKING ABOUT AN ARRAY, NOT A GRAPH!
 		int dy = (move.y - Y());
 		int dx = (move.x - X());
-		if (move.x == end->X() || move.y == end->Y()) {
-		spots.push_back(move);
+		if (move.x == end->X() &&  move.y == end->Y()) {
+			spots.push_back(move);
 		}
 		if (dx == 0) {
 			continue;
